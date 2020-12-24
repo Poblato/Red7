@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Red_7_v2._0
+namespace Red_7._0
 {
     public class Card
     {
