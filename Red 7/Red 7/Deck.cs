@@ -8,7 +8,7 @@ namespace Red_7_v2._0
     {
         private Card[] deck;
         private int constSize = 49;
-        private int size = constSize;
+        private int size;
 
         public Deck()
         {
@@ -17,6 +17,7 @@ namespace Red_7_v2._0
         }
         public void Reset()
         {
+            size = constSize;
             for (int i = 0; i < 49; i++)
             {
                 deck[i] = new Card((i + 1) / 7, (i + 1) % 7);

@@ -11,12 +11,12 @@ namespace Red_7_v2._0
             List<Card> cards = new List<Card>();
             Card c;
 
-            for (int i = 0; i < Size(); i++)
+            for (int i = 0; i < size; i++)
             {
-                c = GetCard(i)
+                c = GetCard(i);
                 if (c.Rank % 2 == 0)
                 {
-                    cards.Add(c)
+                    cards.Add(c);
                 }
             }
             return cards;
@@ -26,12 +26,12 @@ namespace Red_7_v2._0
             List<Card> cards = new List<Card>();
             Card c;
 
-            for (int i = 0; i < Size(); i++)
+            for (int i = 0; i < size; i++)
             {
-                c = GetCard(i)
+                c = GetCard(i);
                 if (c.Rank == num)
                 {
-                    cards.Add(c)
+                    cards.Add(c);
                 }
             }
             return cards;
@@ -41,12 +41,12 @@ namespace Red_7_v2._0
             List<Card> cards = new List<Card>();
             Card c;
 
-            for (int i = 0; i < Size(); i++)
+            for (int i = 0; i < size; i++)
             {
-                c = GetCard(i)
+                c = GetCard(i);
                 if (c.Colour == col)
                 {
-                    cards.Add(c)
+                    cards.Add(c);
                 }
             }
             return cards;

@@ -29,5 +29,9 @@ namespace Red_7_v2._0
         {
             return (GetColourAsString() + " " + GetRankAsString());
         }
+        public int GetScore()
+        {
+            return rank * 7 + colour;
+        }
     }
 }
