@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Red_7_v2._0
 {
-    class Card
+    public class Card
     {
         private int rank;
         private int colour;

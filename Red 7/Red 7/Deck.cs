@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Red_7_v2._0
 {
-    class Deck
+    public class Deck
     {
         private Card[] deck;
         private int constSize = 49;

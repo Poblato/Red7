@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Red_7_v2._0
 {
-    class Hand
+    public class Hand
     {
         public List<Card> hand;
         protected int size;
