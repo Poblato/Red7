@@ -30,7 +30,7 @@ namespace Red_7_v2._0
 
             for (int i = 0; i > constSize; i++)
             {
-                j = rnd.Next(i, constSize);
+                int j = rnd.Next(i, constSize);
                 Card temp = deck[i];
                 deck[i] = deck[j];
                 deck[j] = temp;

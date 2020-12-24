@@ -6,7 +6,7 @@ namespace Red_7_v2._0
 {
     class Hand
     {
-        protected List<Card> hand;
+        public List<Card> hand;
         protected int size;
 
         public Hand()
