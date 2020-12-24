@@ -6,18 +6,50 @@ namespace Red_7_v2._0
 {
     class Palette : Hand
     {
-        public Card GetCardByValue(int r, int c)
+        public List<Card> GetEvenCards()
         {
-            int index = -1;
+            List<Card> cards = new List<Card>();
+            Card c;
 
-            if (index == -1)
+            for (int i = 0; i < Size(); i++)
             {
-                return -1;
+                c = GetCard(i)
+                if (c.Rank % 2 == 0)
+                {
+                    cards.Add(c)
+                }
             }
-            else
+            return cards;
+        }
+        public List<Card> FindCardsByNumber(int num)
+        {
+            List<Card> cards = new List<Card>();
+            Card c;
+
+            for (int i = 0; i < Size(); i++)
             {
-                return GetCardByIndex(index);
+                c = GetCard(i)
+                if (c.Rank == num)
+                {
+                    cards.Add(c)
+                }
             }
+            return cards;
+        }
+        public List<Card> FindCardsByColour(int col)
+        {
+            List<Card> cards = new List<Card>();
+            Card c;
+
+            for (int i = 0; i < Size(); i++)
+            {
+                c = GetCard(i)
+                if (c.Colour == col)
+                {
+                    cards.Add(c)
+                }
+            }
+            return cards;
         }
     }
 }
