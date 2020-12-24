@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Red_7_v2._0
 {
-    class Palette : Hand
+    public class Palette : Hand
     {
         public List<Card> GetEvenCards()
         {
