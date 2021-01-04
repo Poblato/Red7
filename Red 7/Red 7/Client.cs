@@ -12,7 +12,9 @@ namespace Red_7._0
         private Deck deck;
         private Card canvas;
         private Scorer scorer;
-        public Client(int numPlayers)
+        private bool advanced;
+        private bool actionRule;
+        public Client(int numPlayers, bool advanced, bool actionRule)
         {
             palettes = new List<Palette>();
             hands = new List<Hand>();
@@ -21,6 +23,8 @@ namespace Red_7._0
             canvas = new Card(0, 7);
             players = numPlayers;
             deck.Reset();
+            this.advanced = advanced;
+            this.actionRule = actionRule;
 
             for (int i = 0; i < numPlayers; i++)
             {
@@ -36,6 +40,7 @@ namespace Red_7._0
         {
             bool cont = true;
             bool playedToPalette = false;
+Turn:
             while (cont == true)
             {
                 if (playedToPalette == false)
@@ -46,7 +51,7 @@ namespace Red_7._0
                     switch (input)
                     {
                         case "1":
-                            PlayToPalette(player);
+                            PlayToPalette(player, ref playedToPalette);
                             playedToPalette = true;
                             break;
                         case "2":
@@ -82,13 +87,76 @@ namespace Red_7._0
                 }
             }
             Console.WriteLine("Turn ended");
+
+            bool winning = CheckWinner(player);
+
+            if (winning != true)
+            {
+                LossConfirmation:
+                Console.WriteLine("You are not winning press (1) to undo, or (2) to reset, or (3) to end turn and lose");
+                string input = Console.ReadLine();
+
+                switch (input)
+                {
+                    case "1":
+                        Undo();
+                        goto Turn;
+                    case "2":
+                        //reset
+                        goto Turn;
+                    case "3":
+                        break;
+                    default:
+                        Console.WriteLine("no");
+                        goto LossConfirmation;
+                }
+            }
         }
-        public void PlayToPalette(int player)
+        public void Undo()
         {
+            //undoes the last action taken
+        }
+        public void PlayToPalette(int player, ref bool playedToPalette)
+        {
+            Card card = new Card(0, 0);
+
+            //play to palette
+
+            if (actionRule && card.Rank % 2 == 1)
+            {
+                switch (card.Rank)
+                {
+                    case 1:
+                        //discard a card from other players' palette (that player must have more or same cards in palette than current player)
+                        break;
+                    case 3:
+                        hands[player].AddCard(deck.DrawCard());//draw a card
+                        break;
+                    case 5:
+                        playedToPalette = false;//allows the player to play another card 
+                        break;
+                    case 7:
+                        //discard a card from player's palette
+                        break;
+                    default:
+                        throw new Exception("Invalid odd card rank in palette " + player.ToString());
+                }
+            }
             Console.WriteLine("played to palette");
         }
         public void DiscardToCanvas(int player)
         {
+            Card card = new Card(0, 0);
+
+            //discard to canvas
+
+            if (advanced == true)
+            {
+                if (card.Rank > palettes[player].Size)
+                {
+                    hands[player].AddCard(deck.DrawCard());//draws a card
+                }
+            }
             Console.WriteLine("discarded to canvas");
         }
         public void Debug()

@@ -29,7 +29,7 @@ namespace Red_7._0
 				case 7:
 					return HighestCard(palettes, currentPlayer);
 				default:
-					throw new Exception("Invalid colour in scoring");
+					throw new Exception("Invalid colour on canvas");
 			}
         }
 		private Card FindHighestCard(List<Card> cards)
