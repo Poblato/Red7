@@ -13,14 +13,13 @@ namespace Red_7._0
         public Deck()
         {
             deck = new Card[constSize];
-            Reset();
         }
         public void Reset()
         {
             size = constSize;
             for (int i = 0; i < 49; i++)
             {
-                deck[i] = new Card((i + 1) / 7, (i + 1) % 7);
+                deck[i] = new Card((i % 7) + 1, (i / 7) + 1);
             }
             Shuffle();
         }
@@ -28,7 +27,7 @@ namespace Red_7._0
         {
             Random rnd = new Random();
 
-            for (int i = 0; i > constSize; i++)
+            for (int i = 0; i < constSize; i++)
             {
                 int j = rnd.Next(i, constSize);
                 Card temp = deck[i];
@@ -38,7 +37,7 @@ namespace Red_7._0
         }
         public Card DrawCard()
         {
-            Card c = deck[size];
+            Card c = deck[size - 1];
             size--;
             return c;
         }

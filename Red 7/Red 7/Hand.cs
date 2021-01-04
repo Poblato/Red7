@@ -37,9 +37,9 @@ namespace Red_7._0
             }
             return -1;
         }
-        public void AddCard(int r, int c)
+        public void AddCard(Card card)
         {
-            hand.Add(new Card(r, c));
+            hand.Add(card);
             size++;
         }
         public void RemoveCard(Card c)

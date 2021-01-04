@@ -6,7 +6,9 @@ namespace Red_7._0
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Client client = new Client(3);
+
+            client.Debug();
         }
     }
 }

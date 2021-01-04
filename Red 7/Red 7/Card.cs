@@ -23,7 +23,7 @@ namespace Red_7._0
         public string GetColourAsString()
         {
             string[] colours = { "Violet", "Indigo", "Blue", "Green", "Yellow", "Orange", "Red" };
-            return colours[colour];
+            return colours[colour - 1];
         }
         public string GetName()
         {
