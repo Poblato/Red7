@@ -6,13 +6,14 @@ namespace Red_7._0
 {
     public class Hand
     {
-        public List<Card> hand;
+        protected List<Card> hand;
         protected int size;
 
         public Hand()
         {
             hand = new List<Card>();
         }
+        public List<Card> Cards { get { return hand; } }
         public int Size { get { return size; } }
         public Card GetCard(int index)
         {

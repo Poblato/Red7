@@ -54,11 +54,11 @@ namespace Red_7._0
             {
 				if (i == currentPlayer)
                 {
-					highestPlayerCard = FindHighestCard(palettes[i].hand);
+					highestPlayerCard = FindHighestCard(palettes[i].Cards);
                 }
                 else
                 {
-					c = FindHighestCard(palettes[i].hand);
+					c = FindHighestCard(palettes[i].Cards);
 					if (c.GetScore() > highestOpponentCard.GetScore())
                     {
 						highestOpponentCard = c;
@@ -207,7 +207,7 @@ namespace Red_7._0
 						}
                     }
 					playerColours = colours.Count;
-					playerHighestCard = FindHighestCard(palettes[i].hand);
+					playerHighestCard = FindHighestCard(palettes[i].Cards);
                 }
                 else
                 {
@@ -218,10 +218,10 @@ namespace Red_7._0
 							colours.Add(palettes[i].GetCard(x).Colour);
 						}
 					}
-					if (colours.Count > opponentColours || ( colours.Count == opponentColours && FindHighestCard(palettes[i].hand).GetScore() > opponentHighestCard.GetScore()))
+					if (colours.Count > opponentColours || ( colours.Count == opponentColours && FindHighestCard(palettes[i].Cards).GetScore() > opponentHighestCard.GetScore()))
                     {
 						opponentColours = colours.Count;
-						opponentHighestCard = FindHighestCard(palettes[i].hand);
+						opponentHighestCard = FindHighestCard(palettes[i].Cards);
                     }
 				}
 				colours.Clear();

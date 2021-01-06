@@ -10,6 +10,7 @@ namespace Red_7._0
         private int constSize = 49;
         private int size;
 
+        public int Size { get { return size; } }
         public Deck()
         {
             deck = new Card[constSize];
@@ -40,6 +41,11 @@ namespace Red_7._0
             Card c = deck[size - 1];
             size--;
             return c;
+        }
+        public void AddCard(Card card)
+        {
+            deck[size] = card;
+            size++;
         }
     }
 }

@@ -10,21 +10,25 @@ namespace Red_7._0
         private List<Palette> palettes;
         private List<Hand> hands;
         private Deck deck;
-        private Card canvas;
+        private Stack<Card> canvas;
         private Scorer scorer;
         private bool advanced;
         private bool actionRule;
+        private Stack<Action> actions;
         public Client(int numPlayers, bool advanced, bool actionRule)
         {
             palettes = new List<Palette>();
             hands = new List<Hand>();
             deck = new Deck();
             scorer = new Scorer();
-            canvas = new Card(0, 7);
+            canvas = new Stack<Card>();
+            actions = new Stack<Action>();
             players = numPlayers;
             deck.Reset();
             this.advanced = advanced;
             this.actionRule = actionRule;
+
+            canvas.Push(new Card(0, 7));
 
             for (int i = 0; i < numPlayers; i++)
             {
@@ -34,7 +38,7 @@ namespace Red_7._0
         }
         private bool CheckWinner(int currentPlayer)
         {
-            return scorer.Score(palettes, currentPlayer, canvas.Colour);
+            return scorer.Score(palettes, currentPlayer, canvas.Peek().Colour);
         }
         public void PlayTurn(int player)
         {
@@ -45,14 +49,14 @@ Turn:
             {
                 if (playedToPalette == false)
                 {
-                    Console.WriteLine("Enter (1) to play to palette, or (2) to discard to canvas, or (3) to end turn");
+                    Console.WriteLine("Enter (1) to play to palette, or (2) to discard to canvas, or (3) to end turn, or (4) to undo");
                     string input = Console.ReadLine();
 
                     switch (input)
                     {
                         case "1":
-                            PlayToPalette(player, ref playedToPalette);
                             playedToPalette = true;
+                            PlayToPalette(player, ref playedToPalette);
                             break;
                         case "2":
                             DiscardToCanvas(player);
@@ -61,6 +65,9 @@ Turn:
                         case "3":
                             cont = false;
                             break;
+                        case "4":
+                            Undo();
+                            break;
                         default:
                             Console.WriteLine("No");
                             break;
@@ -68,7 +75,7 @@ Turn:
                 }
                 else
                 {
-                    Console.WriteLine("Enter (1) to discard to canvas, or (2) to end turn");
+                    Console.WriteLine("Enter (1) to discard to canvas, or (2) to end turn, or (3) to undo");
                     string input = Console.ReadLine();
 
                     switch (input)
@@ -79,6 +86,9 @@ Turn:
                             break;
                         case "2":
                             cont = false;
+                            break;
+                        case "3":
+                            Undo();
                             break;
                         default:
                             Console.WriteLine("No");
@@ -102,7 +112,12 @@ Turn:
                         Undo();
                         goto Turn;
                     case "2":
-                        //reset
+                        while (actions.Count != 0)
+                        {
+                            Undo();
+                        }
+                        cont = true;
+                        playedToPalette = false;
                         goto Turn;
                     case "3":
                         break;
@@ -119,8 +134,20 @@ Turn:
         public void PlayToPalette(int player, ref bool playedToPalette)
         {
             Card card = new Card(0, 0);
+            int startIndex = 0;
+            int[] endPos = new int[2];
 
-            //play to palette
+            Console.WriteLine("Choose card to play, cards in hand: " + hands[player].Size);
+            startIndex = int.Parse(Console.ReadLine());
+            endPos[0] = 1;
+            endPos[1] = player;
+            endPos[2] = palettes[player].Size;
+
+            Action action = new Action("playToPalette", card);
+            action.Start = new int[] { 0, player, startIndex };
+            action.Endpoint = endPos;
+
+            actions.Push(action);
 
             if (actionRule && card.Rank % 2 == 1)
             {
@@ -130,7 +157,11 @@ Turn:
                         //discard a card from other players' palette (that player must have more or same cards in palette than current player)
                         break;
                     case 3:
-                        hands[player].AddCard(deck.DrawCard());//draw a card
+                        card = deck.DrawCard();
+                        hands[player].AddCard(card);//draw a card
+                        action = new Action("drawCard", card);
+                        action.Endpoint = new int[] { 0, player, hands[player].Size - 1 };
+                        actions.Push(action);
                         break;
                     case 5:
                         playedToPalette = false;//allows the player to play another card 
@@ -144,11 +175,23 @@ Turn:
             }
             Console.WriteLine("played to palette");
         }
-        public void DiscardToCanvas(int player)
+        private void DiscardToCanvas(int player)
         {
             Card card = new Card(0, 0);
+            int[] startPos = new int[3];
+            startPos[0] = 0;//discard from hand
+            startPos[1] = player;//discard from current player
 
-            //discard to canvas
+            Console.WriteLine("Choose card to discard, cards in hand: " + hands[player].Size);
+            int index = int.Parse(Console.ReadLine());
+
+            startPos[2] = index;//which specific card to discard
+
+            Action action = DiscardCard(startPos, -1);// -1 to discard to canvas
+
+            action.End = true;
+
+            actions.Push(action);
 
             if (advanced == true)
             {
@@ -158,6 +201,41 @@ Turn:
                 }
             }
             Console.WriteLine("discarded to canvas");
+        }
+        private Action DiscardCard(int[] startPos, int target)
+        {
+            Card card = new Card(0, 0);
+            int targetPos = 0;
+            if (startPos[0] == 0)
+            {
+                card = hands[startPos[1]].GetCard(startPos[2]);
+                hands[startPos[1]].RemoveCardByIndex(startPos[2]);
+            }
+            else if (startPos[0] == 1)
+            {
+                card = palettes[startPos[1]].GetCard(startPos[2]);
+                palettes[startPos[1]].RemoveCardByIndex(startPos[2]);
+            }
+            Action action = new Action("discardCard", card);
+            action.Start = startPos;
+
+
+            switch (target)
+            {
+                case -1://canvas
+                    canvas.Push(card);
+                    break;
+                case -2://deck
+                    targetPos = deck.Size;
+                    deck.AddCard(card);
+                    break;
+                default://player
+                    targetPos = palettes[target].Size;
+                    palettes[target].AddCard(card);
+                    break;
+            }
+            action.Endpoint = new int[] { 1, target, targetPos };
+            return action;
         }
         public void Debug()
         {
@@ -170,7 +248,7 @@ Turn:
             palettes[2].AddCard(new Card(3, 5));
             palettes[2].AddCard(new Card(6, 4));
 
-            canvas = new Card(0, 6);
+            canvas.Push(new Card(0, 6));
 
             PlayTurn(0);
         }
