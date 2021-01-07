@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace Red_7._0
+namespace Red_7_GUI
 {
     public class Client
     {
@@ -44,7 +46,7 @@ namespace Red_7._0
         {
             bool cont = true;
             bool playedToPalette = false;
-Turn:
+        Turn:
             while (cont == true)
             {
                 if (playedToPalette == false)
@@ -102,7 +104,7 @@ Turn:
 
             if (winning != true)
             {
-                LossConfirmation:
+            LossConfirmation:
                 Console.WriteLine("You are not winning press (1) to undo, or (2) to reset, or (3) to end turn and lose");
                 string input = Console.ReadLine();
 
@@ -163,7 +165,7 @@ Turn:
                         index = int.Parse(Console.ReadLine());
                         Console.WriteLine("Choose whether to discard to canvas (-1) or deck (-2)");
                         int choice = int.Parse(Console.ReadLine());
-                        action = DiscardCard(new int[] { 1, target, index }, choice );
+                        action = DiscardCard(new int[] { 1, target, index }, choice);
                         action.End = false;
                         actions.Push(action);
                         break;

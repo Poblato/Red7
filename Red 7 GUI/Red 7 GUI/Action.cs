@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace Red_7._0
+namespace Red_7_GUI
 {
     public class Action
     {
@@ -28,7 +30,7 @@ namespace Red_7._0
                     throw new Exception("Invalid action type");
             }
         }
-        public bool End{ get{ return end; } set { end = value; } }
+        public bool End { get { return end; } set { end = value; } }
         public int[] StartPos { get { return startPos; } set { startPos = value; } }
         public int[] EndPos { get { return EndPos; } set { EndPos = value; } }
         public string Type { get { return type; } }
