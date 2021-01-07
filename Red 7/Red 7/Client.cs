@@ -136,6 +136,8 @@ Turn:
             Card card = new Card(0, 0);
             int startIndex = 0;
             int[] endPos = new int[2];
+            int index;
+            int target;
 
             Console.WriteLine("Choose card to play, cards in hand: " + hands[player].Size);
             startIndex = int.Parse(Console.ReadLine());
@@ -155,6 +157,15 @@ Turn:
                 {
                     case 1:
                         //discard a card from other players' palette (that player must have more or same cards in palette than current player)
+                        Console.WriteLine("Choose a player to discard from (0 - {0})", (players - 1).ToString());
+                        target = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Choose a card to discard, cards in palette: " + palettes[target].Size);
+                        index = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Choose whether to discard to canvas (-1) or deck (-2)");
+                        int choice = int.Parse(Console.ReadLine());
+                        action = DiscardCard(new int[] { 1, target, index }, choice );
+                        action.End = false;
+                        actions.Push(action);
                         break;
                     case 3:
                         card = deck.DrawCard();
@@ -168,6 +179,13 @@ Turn:
                         break;
                     case 7:
                         //discard a card from player's palette
+                        Console.WriteLine("Choose a card to discard, cards in palette: " + palettes[player].Size);
+                        index = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Choose whether to discard to canvas (-1) or deck (-2)");
+                        target = int.Parse(Console.ReadLine());
+                        action = DiscardCard(new int[] { 1, player, index }, target);
+                        action.End = false;
+                        actions.Push(action);
                         break;
                     default:
                         throw new Exception("Invalid odd card rank in palette " + player.ToString());
