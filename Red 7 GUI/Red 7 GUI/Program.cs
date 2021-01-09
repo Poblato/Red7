@@ -6,21 +6,31 @@ using System.Windows.Forms;
 
 namespace Red_7_GUI
 {
-    static class Program
+    public static class Program
     {
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
+        
+        static private GameScreen gameScreen;
         [STAThread]
         static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
-
-            Client client = new Client(3, true, true);
-
-            client.Debug();
+            gameScreen = new GameScreen(4, true, true);
+            Application.Run(gameScreen);
+        }
+        public static void Update(int set)//updates a hand/palette - 1 for hand, other nums for palettes
+        {
+            if (set == -1)
+            {
+                gameScreen.RedrawHand();
+            }
+            else
+            {
+                gameScreen.RedrawPalette(set);
+            }
         }
     }
 }
