@@ -23,6 +23,7 @@ namespace Red_7_GUI
         public GameScreen(int players, bool advanced, bool actionRule)
         {
             InitializeComponent();
+            this.Text = "Game: " + players.ToString() + " players";
             client = new Client(players, advanced, actionRule);
             cards = new List<List<Button>>();
             playerHand = new List<Button>();
@@ -202,6 +203,7 @@ namespace Red_7_GUI
                     }
                 }
             }
+            //MessageBox.Show(client.GameState.ToString());
         }
         private void handCardClick(object sender, MouseEventArgs e)
         {
@@ -241,15 +243,21 @@ namespace Red_7_GUI
                     Invalidate();
                 }
             }
-            MessageBox.Show(client.GameState.ToString());
-        }
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
+            //MessageBox.Show(client.GameState.ToString());
         }
         private void undoButton_Click(object sender, EventArgs e)
         {
+            MessageBox.Show("Undo");
             client.Undo();
+        }
+        private void endTurnButton_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("End turn");
+        }
+
+        private void helpButton_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("open rules/gui overview screen");
         }
     }
 }

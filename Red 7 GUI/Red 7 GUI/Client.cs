@@ -99,6 +99,19 @@ namespace Red_7_GUI
                 case 1:
                     //discard a card from other players' palette (that player must have more or same cards in palette than current player)
                     gameState = 3;
+
+                    bool largestPalette = true;//if the player's palette is largest, they are unable to discard from another player
+                    for (int i = 1; i < players; i++)
+                    {
+                        if (palettes[i].Size >= palettes[0].Size)
+                        {
+                            largestPalette = false;
+                        }
+                    }
+                    if (largestPalette == true)
+                    {
+                        gameState = 1;
+                    }
                     break;
                 case 3:
                     card = deck.DrawCard();

@@ -38,12 +38,15 @@ namespace Red_7_GUI
             this.playerName = new System.Windows.Forms.Label();
             this.opponent1Panel = new System.Windows.Forms.Panel();
             this.opponent1PalettePanel = new System.Windows.Forms.Panel();
+            this.opponent1HandButton = new System.Windows.Forms.Button();
             this.opponent1Name = new System.Windows.Forms.Label();
             this.opponent2Panel = new System.Windows.Forms.Panel();
             this.opponent2PalettePanel = new System.Windows.Forms.Panel();
+            this.opponent2HandButton = new System.Windows.Forms.Button();
             this.opponent2Name = new System.Windows.Forms.Label();
             this.opponent3Panel = new System.Windows.Forms.Panel();
             this.opponent3PalettePanel = new System.Windows.Forms.Panel();
+            this.opponent3HandButton = new System.Windows.Forms.Button();
             this.opponent3Name = new System.Windows.Forms.Label();
             this.endTurnButton = new System.Windows.Forms.Button();
             this.undoButton = new System.Windows.Forms.Button();
@@ -52,9 +55,6 @@ namespace Red_7_GUI
             this.canvas = new System.Windows.Forms.Button();
             this.deck = new System.Windows.Forms.Button();
             this.helpButton = new System.Windows.Forms.Button();
-            this.opponent1HandButton = new System.Windows.Forms.Button();
-            this.opponent2HandButton = new System.Windows.Forms.Button();
-            this.opponent3HandButton = new System.Windows.Forms.Button();
             this.playerPanel.SuspendLayout();
             this.playerPalettePanel.SuspendLayout();
             this.playerHandPanel.SuspendLayout();
@@ -156,6 +156,17 @@ namespace Red_7_GUI
             this.opponent1PalettePanel.Size = new System.Drawing.Size(700, 110);
             this.opponent1PalettePanel.TabIndex = 2;
             // 
+            // opponent1HandButton
+            // 
+            this.opponent1HandButton.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.opponent1HandButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.opponent1HandButton.Location = new System.Drawing.Point(625, 15);
+            this.opponent1HandButton.Name = "opponent1HandButton";
+            this.opponent1HandButton.Size = new System.Drawing.Size(60, 80);
+            this.opponent1HandButton.TabIndex = 0;
+            this.opponent1HandButton.Text = "Hand: 7";
+            this.opponent1HandButton.UseVisualStyleBackColor = false;
+            // 
             // opponent1Name
             // 
             this.opponent1Name.AutoSize = true;
@@ -185,6 +196,17 @@ namespace Red_7_GUI
             this.opponent2PalettePanel.Name = "opponent2PalettePanel";
             this.opponent2PalettePanel.Size = new System.Drawing.Size(700, 110);
             this.opponent2PalettePanel.TabIndex = 3;
+            // 
+            // opponent2HandButton
+            // 
+            this.opponent2HandButton.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.opponent2HandButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.opponent2HandButton.Location = new System.Drawing.Point(625, 15);
+            this.opponent2HandButton.Name = "opponent2HandButton";
+            this.opponent2HandButton.Size = new System.Drawing.Size(60, 80);
+            this.opponent2HandButton.TabIndex = 1;
+            this.opponent2HandButton.Text = "Hand: 7";
+            this.opponent2HandButton.UseVisualStyleBackColor = false;
             // 
             // opponent2Name
             // 
@@ -216,6 +238,17 @@ namespace Red_7_GUI
             this.opponent3PalettePanel.Size = new System.Drawing.Size(700, 110);
             this.opponent3PalettePanel.TabIndex = 4;
             // 
+            // opponent3HandButton
+            // 
+            this.opponent3HandButton.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.opponent3HandButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.opponent3HandButton.Location = new System.Drawing.Point(625, 15);
+            this.opponent3HandButton.Name = "opponent3HandButton";
+            this.opponent3HandButton.Size = new System.Drawing.Size(60, 80);
+            this.opponent3HandButton.TabIndex = 9;
+            this.opponent3HandButton.Text = "Hand: 7";
+            this.opponent3HandButton.UseVisualStyleBackColor = false;
+            // 
             // opponent3Name
             // 
             this.opponent3Name.AutoSize = true;
@@ -236,6 +269,7 @@ namespace Red_7_GUI
             this.endTurnButton.TabIndex = 5;
             this.endTurnButton.Text = "End Turn";
             this.endTurnButton.UseVisualStyleBackColor = true;
+            this.endTurnButton.Click += new System.EventHandler(this.endTurnButton_Click);
             // 
             // undoButton
             // 
@@ -301,39 +335,7 @@ namespace Red_7_GUI
             this.helpButton.TabIndex = 8;
             this.helpButton.Text = "Help";
             this.helpButton.UseVisualStyleBackColor = true;
-            // 
-            // opponent1HandButton
-            // 
-            this.opponent1HandButton.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.opponent1HandButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.opponent1HandButton.Location = new System.Drawing.Point(625, 15);
-            this.opponent1HandButton.Name = "opponent1HandButton";
-            this.opponent1HandButton.Size = new System.Drawing.Size(60, 80);
-            this.opponent1HandButton.TabIndex = 0;
-            this.opponent1HandButton.Text = "Hand: 7";
-            this.opponent1HandButton.UseVisualStyleBackColor = false;
-            // 
-            // opponent2HandButton
-            // 
-            this.opponent2HandButton.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.opponent2HandButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.opponent2HandButton.Location = new System.Drawing.Point(625, 15);
-            this.opponent2HandButton.Name = "opponent2HandButton";
-            this.opponent2HandButton.Size = new System.Drawing.Size(60, 80);
-            this.opponent2HandButton.TabIndex = 1;
-            this.opponent2HandButton.Text = "Hand: 7";
-            this.opponent2HandButton.UseVisualStyleBackColor = false;
-            // 
-            // opponent3HandButton
-            // 
-            this.opponent3HandButton.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.opponent3HandButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.opponent3HandButton.Location = new System.Drawing.Point(625, 15);
-            this.opponent3HandButton.Name = "opponent3HandButton";
-            this.opponent3HandButton.Size = new System.Drawing.Size(60, 80);
-            this.opponent3HandButton.TabIndex = 9;
-            this.opponent3HandButton.Text = "Hand: 7";
-            this.opponent3HandButton.UseVisualStyleBackColor = false;
+            this.helpButton.Click += new System.EventHandler(this.helpButton_Click);
             // 
             // GameScreen
             // 
@@ -350,8 +352,6 @@ namespace Red_7_GUI
             this.Controls.Add(this.playerPanel);
             this.Controls.Add(this.Title);
             this.Name = "GameScreen";
-            this.Text = "Form1";
-            this.Load += new System.EventHandler(this.Form1_Load);
             this.playerPanel.ResumeLayout(false);
             this.playerPanel.PerformLayout();
             this.playerPalettePanel.ResumeLayout(false);
