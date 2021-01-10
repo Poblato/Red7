@@ -13,7 +13,7 @@ namespace Red_7_GUI
     public partial class GameScreen : Form
     {
         private Client client;
-        private Button[] playerHand;
+        private List<Button> playerHand;
         private List<List<Button>> cards;
         private int cardHeight = 80;
         private int cardWidth = 60;
@@ -25,28 +25,23 @@ namespace Red_7_GUI
             InitializeComponent();
             client = new Client(players, advanced, actionRule);
             cards = new List<List<Button>>();
-            playerHand = new Button[7];
+            playerHand = new List<Button>();
             this.players = players;
-            for(int i = 0; i < players; i++)
+            for (int i = 0; i < players; i++)
             {
                 cards.Add(new List<Button>());
             }
+            //client.Debug();
 
             Setup();
         }
         private void Setup()
         {
-            for (int x = 0; x < players; x++)
+            RedrawHand();
+            for (int i = 0; i < players; i++)
             {
-                CreatePaletteCard(client.Palettes[x].GetCard(0), x);
+                RedrawPalette(i);
             }
-            for (int i = 0; i < 7; i++)
-            {
-                CreateHandCard(i);
-            }
-            
-            UpdateLabels();
-            Invalidate();
         }
         private void UpdateLabels()
         {
@@ -56,139 +51,163 @@ namespace Red_7_GUI
             opponent2HandButton.Text = "Hand: " + client.Hands[2].Size.ToString();
             opponent3HandButton.Text = "Hand: " + client.Hands[3].Size.ToString();
         }
-        private void CreateHandCard(int pos)
+        public void RedrawHand()
         {
-            Card card = client.Hands[0].GetCard(pos);
-            playerHand[pos] = new Button()
+            //MessageBox.Show("Redrawing hand");
+            foreach (Button b in playerHand)
             {
-                Size = new Size(cardWidth, cardHeight),
-                Location = new Point((cardWidth + 15) * pos + 60, 175),
-            };
-            playerHand[pos].ForeColor = Color.Black;
-            playerHand[pos].BackColor = Color.LightGray;
-            playerHand[pos].Text = card.GetName();
-            // add to Form's Controls so that they show up
-            playerHand[pos].MouseDown += new MouseEventHandler(handCardClick);
-            // 
-            Controls.Add(playerHand[pos]);
-            playerHand[pos].BringToFront();
-        }
-        private void CreatePaletteCard(Card card, int player)
-        {
-            int pos = client.Palettes[player].Size - 1;
-            if (player == 0)
+                b.Dispose();
+            }
+            playerHand.Clear();
+
+            for (int i = 0; i < client.Hands[0].Size; i++)
             {
-                cards[player].Add(new Button()
+                Card card = client.Hands[0].GetCard(i);
+                playerHand.Add(new Button()
                 {
                     Size = new Size(cardWidth, cardHeight),
-                    Location = new Point((cardWidth + 15) * pos + 60, top),
+                    Location = new Point((cardWidth + 15) * i + 60, 175),
+                    BackColor = Color.LightGray,
+                    ForeColor = Color.Black,
+                    Text = card.GetName(),
                 });
+                // add to Form's Controls so that they show up
+                playerHand[i].MouseDown += new MouseEventHandler(handCardClick);
+                // 
+                Controls.Add(playerHand[i]);
+                playerHand[i].BringToFront();
+            }
+            UpdateLabels();
+        }
+        public void RedrawPalette(int player)
+        {
+            //MessageBox.Show("Redrawing palette " + player.ToString());
+            Card card;
+            foreach (Button b in cards[player])
+            {
+                b.Dispose();
+            }
+            cards[player].Clear();
+
+            if (player == 0)
+            {
+                for (int i = 0; i < client.Palettes[player].Size; i++)
+                {
+                    card = client.Palettes[player].GetCard(i);
+                    cards[player].Add(new Button()
+                    {
+                        Size = new Size(cardWidth, cardHeight),
+                        Location = new Point((cardWidth + 15) * i + 60, top),
+                        BackColor = Color.LightGray,
+                        ForeColor = Color.Black,
+                        Text = card.GetName(),
+                    });
+                    // add to Form's Controls so that they show up
+                    cards[player][i].MouseDown += new MouseEventHandler(paletteCardClick);
+                    // 
+                    Controls.Add(cards[player][i]);
+                    cards[player][i].BringToFront();
+                }
             }
             else
             {
-                cards[player].Add(new Button()
+                for (int i = 0; i < client.Palettes[player].Size; i++)
                 {
-                    Size = new Size(cardWidth, cardHeight),
-                    Location = new Point((cardWidth + 15) * pos + 60, (player * 190) + 285),
-                });
-            }
-
-            cards[player][pos].ForeColor = Color.Black;
-            cards[player][pos].BackColor = Color.LightGray;
-            cards[player][pos].Text = card.GetName();
-            // add to Form's Controls so that they show up
-
-            cards[player][pos].MouseDown += new MouseEventHandler(paletteCardClick);
-            Controls.Add(cards[player][pos]);
-            cards[player][pos].BringToFront();
-        }
-        private void MoveCard(int[] pos, int target)//pos is in the form [hand/palette, player, index] (appends to target
-        {
-            int index;
-            if (pos[0] == 0)//move from hand
-            {
-                switch (target)
-                {
-                    case (-1)://move to canvas
-                        playerHand[pos[2]].Dispose();
-                        break;
-                    case (-2)://move to deck
-                        playerHand[pos[2]].Dispose();
-                        break;
-                    default://move to player palette
-                        index = client.Palettes[target].Size;
-                        cards[target].Add(new Button()
-                        {
-                            Size = new Size(cardWidth, cardHeight),
-                            Location = new Point((cardWidth + 15) * index + 60, top),
-                            Text = playerHand[pos[2]].Text,
-                            BackColor = Color.LightGray,
-                            ForeColor = Color.Black,
-                        });
-                        cards[target][index].MouseDown += new MouseEventHandler(paletteCardClick);
-                        Controls.Add(cards[target][index]);
-                        cards[target][index].BringToFront();
-                        playerHand[pos[2]].Dispose();
-                        break;
+                    card = client.Palettes[player].GetCard(i);
+                    cards[player].Add(new Button()
+                    {
+                        Size = new Size(cardWidth, cardHeight),
+                        Location = new Point((cardWidth + 15) * i + 60, (player * 190) + 285),
+                        BackColor = Color.LightGray,
+                        ForeColor = Color.Black,
+                        Text = card.GetName(),
+                    });
+                    // add to Form's Controls so that they show up
+                    cards[player][i].MouseDown += new MouseEventHandler(paletteCardClick);
+                    // 
+                    Controls.Add(cards[player][i]);
+                    cards[player][i].BringToFront();
                 }
             }
-            else//move from palette
-            {
-                switch (target)
-                {
-                    case (-1)://move to canvas
-                        cards[pos[1]][pos[2]].Dispose();
-                        break;
-                    case (-2)://move to deck
-                        cards[pos[1]][pos[2]].Dispose();
-                        break;
-                    default://move to player palette
-                        index = client.Palettes[target].Size - 1;
-                        cards[target].Add(new Button()
-                        {
-                            Size = new Size(cardWidth, cardHeight),
-                            Text = playerHand[pos[2]].Text,
-                            BackColor = Color.LightGray,
-                            ForeColor = Color.Black,
-                        });
-                        if (target == 0)
-                        {
-                            cards[target][index].Location = new Point((cardWidth + 15) * index + 60, top);
-                        }
-                        else
-                        {
-                            cards[target][index].Location = new Point((cardWidth + 15) * index + 60, (target * 190) + 285);
-                        }
-                        cards[target][index].MouseDown += new MouseEventHandler(paletteCardClick);
-                        Controls.Add(cards[target][index]);
-                        cards[target][index].BringToFront();
-                        cards[pos[1]][pos[2]].Dispose();
-
-                        cards[target][index].BringToFront();
-                        break;
-                }
-            }
-        }
-        private void MoveCard(int[] startPos, int[] endPos)//start/endPos is in the form [hand/palette, player, index] (specified enpoint version)
-        {
-
+            UpdateLabels();
         }
         private void paletteCardClick(object sender, MouseEventArgs e)
         {
+            int player = -1;
+            int index = -1;
+
+            for (int i = 0; i < cards.Count; i++)//finds index of card clicked
+            {
+                for (int x = 0; x < cards[i].Count; x++)
+                {
+                    if (sender.Equals(cards[i][x]))
+                    {
+                        player = i;
+                        index = x;
+                        break;
+                    }
+                }
+            }
+
+            if (index == -1 || player == -1)
+            {
+                throw new Exception("Clicked card not found");
+            }
+
             if (client.GameState == 3)//if discarding from other palette
             {
-                MessageBox.Show("discard from other palette");
+                if (player == 0)
+                {
+                    MessageBox.Show("Cannot dicard your own card");
+                }
+                else if (cards[player].Count < cards[0].Count)
+                {
+                    MessageBox.Show("Cannot discard from a player with less cards than you");
+                }
+                else
+                {
+                    if (e.Button == MouseButtons.Left)
+                    {
+                        client.DiscardPaletteCard(player, index, -1);
+                        RedrawPalette(player);
+                        UpdateLabels();
+                    }
+                    else if (e.Button == MouseButtons.Right)
+                    {
+                        client.DiscardPaletteCard(player, index, -2);
+                        RedrawPalette(player);
+                        UpdateLabels();
+                    }
+                }
             }
             else if (client.GameState == 4)//if discarding from own palette
             {
-                MessageBox.Show("discard from own palette");
+                if (player != 0)
+                {
+                    MessageBox.Show("Cannot dicard another player's card");
+                }
+                else
+                {
+                    if (e.Button == MouseButtons.Left)
+                    {
+                        client.DiscardPaletteCard(player, index, -1);
+                        RedrawPalette(player);
+                        UpdateLabels();
+                    }
+                    else if (e.Button == MouseButtons.Right)
+                    {
+                        client.DiscardPaletteCard(player, index, -2);
+                        RedrawPalette(player);
+                        UpdateLabels();
+                    }
+                }
             }
         }
         private void handCardClick(object sender, MouseEventArgs e)
         {
             int index = -1;
 
-            for (int i = 0; i < playerHand.Count(); i++)//finds index of card clicked
+            for (int i = 0; i < playerHand.Count; i++)//finds index of card clicked
             {
                 if (sender.Equals(playerHand[i]))
                 {
@@ -206,8 +225,8 @@ namespace Red_7_GUI
             {
                 if (client.GameState == 0)
                 {
-                    MoveCard(new int[] { 0, 0, index }, 0);
                     client.PlayToPalette(0, index);
+                    RedrawPalette(0);
                     RedrawHand();
                     Invalidate();
                 }
@@ -216,7 +235,6 @@ namespace Red_7_GUI
             {
                 if (client.GameState == 0 || client.GameState == 1)
                 {
-                    MoveCard(new int[] { 0, 0, index }, -1);
                     client.DiscardToCanvas(0, index);
                     canvas.Text = client.Canvas.GetName();
                     RedrawHand();
@@ -225,86 +243,10 @@ namespace Red_7_GUI
             }
             MessageBox.Show(client.GameState.ToString());
         }
-        public void RedrawHand()
-        {
-            foreach (Button b in playerHand)
-            {
-                b.Dispose();
-            }
-
-            for (int i = 0; i < client.Hands[0].Size; i++)
-            {
-                Card card = client.Hands[0].GetCard(i);
-                playerHand[i] = new Button()
-                {
-                    Size = new Size(cardWidth, cardHeight),
-                    Location = new Point((cardWidth + 15) * i + 60, 175),
-                    BackColor = Color.LightGray,
-                    ForeColor = Color.Black,
-                    Text = card.GetName(),
-                };
-                // add to Form's Controls so that they show up
-                playerHand[i].MouseDown += new MouseEventHandler(handCardClick);
-                // 
-                Controls.Add(playerHand[i]);
-                playerHand[i].BringToFront();
-            }
-        }
-        public void RedrawPalette(int player)
-        {
-            Card card;
-            foreach (Button b in cards[player])
-            {
-                b.Dispose();
-            }
-
-            if (player == 0)
-            {
-                for (int i = 0; i < client.Palettes[player].Size; i++)
-                {
-                    card = client.Palettes[player].GetCard(i);
-                    cards[player].Add(new Button()
-                    {
-                        Size = new Size(cardWidth, cardHeight),
-                        Location = new Point((cardWidth + 15) * i + 60, top),
-                        BackColor = Color.LightGray,
-                        ForeColor = Color.Black,
-                        Text = card.GetName(),
-                    });
-                    // add to Form's Controls so that they show up
-                    playerHand[i].MouseDown += new MouseEventHandler(handCardClick);
-                    // 
-                    Controls.Add(playerHand[i]);
-                    playerHand[i].BringToFront();
-                }
-            }
-            else
-            {
-                for (int i = 0; i < client.Palettes[player].Size; i++)
-                {
-                    card = client.Palettes[player].GetCard(i);
-                    cards[player].Add(new Button()
-                    {
-                        Size = new Size(cardWidth, cardHeight),
-                        Location = new Point((cardWidth + 15) * i + 60, (player * 190) + 285),
-                        BackColor = Color.LightGray,
-                        ForeColor = Color.Black,
-                        Text = card.GetName(),
-                    });
-                    // add to Form's Controls so that they show up
-                    playerHand[i].MouseDown += new MouseEventHandler(handCardClick);
-                    // 
-                    Controls.Add(playerHand[i]);
-                    playerHand[i].BringToFront();
-                }
-            }
-        }
-
         private void Form1_Load(object sender, EventArgs e)
         {
 
         }
-
         private void undoButton_Click(object sender, EventArgs e)
         {
             client.Undo();
