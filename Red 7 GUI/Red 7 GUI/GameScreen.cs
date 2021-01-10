@@ -51,6 +51,33 @@ namespace Red_7_GUI
             opponent1HandButton.Text = "Hand: " + client.Hands[1].Size.ToString();
             opponent2HandButton.Text = "Hand: " + client.Hands[2].Size.ToString();
             opponent3HandButton.Text = "Hand: " + client.Hands[3].Size.ToString();
+            UpdateActionLabel();
+        }
+        private void UpdateActionLabel()
+        {
+            switch (client.GameState)
+            {
+                case (-1):
+                    actionLabel.Text = "Waiting for other player(s)...";
+                    break;
+                case (0):
+                    actionLabel.Text = "Play to palette (L click) or discard to canvas (R click) or end turn";
+                    break;
+                case (1):
+                    actionLabel.Text = "Discard to canvas (R click) or end turn";
+                    break;
+                case (2):
+                    actionLabel.Text = "End turn or undo";
+                    break;
+                case (3):
+                    actionLabel.Text = "Discard from other player's palette (L click -> canvas, R click -> deck)";
+                    break;
+                case (4):
+                    actionLabel.Text = "Discard from own palette (L click -> canvas, R click -> deck)";
+                    break;
+                default:
+                    throw new Exception("Invalid game state in action label");
+            }
         }
         public void RedrawHand()
         {
@@ -230,6 +257,7 @@ namespace Red_7_GUI
                     client.PlayToPalette(0, index);
                     RedrawPalette(0);
                     RedrawHand();
+                    UpdateLabels();
                     Invalidate();
                 }
             }
@@ -240,6 +268,7 @@ namespace Red_7_GUI
                     client.DiscardToCanvas(0, index);
                     canvas.Text = client.Canvas.GetName();
                     RedrawHand();
+                    UpdateLabels();
                     Invalidate();
                 }
             }

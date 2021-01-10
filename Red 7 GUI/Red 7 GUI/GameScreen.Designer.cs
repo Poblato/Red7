@@ -55,6 +55,7 @@ namespace Red_7_GUI
             this.canvas = new System.Windows.Forms.Button();
             this.deck = new System.Windows.Forms.Button();
             this.helpButton = new System.Windows.Forms.Button();
+            this.actionLabel = new System.Windows.Forms.Label();
             this.playerPanel.SuspendLayout();
             this.playerPalettePanel.SuspendLayout();
             this.playerHandPanel.SuspendLayout();
@@ -337,11 +338,22 @@ namespace Red_7_GUI
             this.helpButton.UseVisualStyleBackColor = true;
             this.helpButton.Click += new System.EventHandler(this.helpButton_Click);
             // 
+            // actionLabel
+            // 
+            this.actionLabel.AutoSize = true;
+            this.actionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 22.5F);
+            this.actionLabel.Location = new System.Drawing.Point(274, 40);
+            this.actionLabel.Name = "actionLabel";
+            this.actionLabel.Size = new System.Drawing.Size(376, 36);
+            this.actionLabel.TabIndex = 9;
+            this.actionLabel.Text = "Wating for other player(s)...";
+            // 
             // GameScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1344, 987);
+            this.Controls.Add(this.actionLabel);
             this.Controls.Add(this.helpButton);
             this.Controls.Add(this.deckCanvasPanel);
             this.Controls.Add(this.undoButton);
@@ -402,6 +414,7 @@ namespace Red_7_GUI
         private System.Windows.Forms.Button opponent1HandButton;
         private System.Windows.Forms.Button opponent2HandButton;
         private System.Windows.Forms.Button opponent3HandButton;
+        private System.Windows.Forms.Label actionLabel;
     }
 }
 
