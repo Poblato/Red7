@@ -30,7 +30,7 @@ namespace Red_7_GUI
             List<Card> cards = new List<Card>();
             Card c;
 
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < hand.Count; i++)
             {
                 c = GetCard(i);
                 if (c.Rank % 2 == 0)
@@ -45,7 +45,7 @@ namespace Red_7_GUI
             List<Card> cards = new List<Card>();
             Card c;
 
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < hand.Count; i++)
             {
                 c = GetCard(i);
                 if (c.Rank == num)
@@ -60,7 +60,7 @@ namespace Red_7_GUI
             List<Card> cards = new List<Card>();
             Card c;
 
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < hand.Count; i++)
             {
                 c = GetCard(i);
                 if (c.Colour == col)
@@ -75,7 +75,7 @@ namespace Red_7_GUI
             List<Card> cards = new List<Card>();
             Card c;
 
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < hand.Count; i++)
             {
                 c = GetCard(i);
                 if (c.Rank < 4)

@@ -17,6 +17,8 @@ namespace Red_7_GUI
         private bool advanced;
         private bool actionRule;
         private Stack<Action> actions;
+        private bool canEnd; // if the turn can be ended or actions must be undone beforehand (to prevent a losing player changing the outcome of the game)
+
         private int gameState; /*defines the state of the client
                                 * -1: other player's turn
                                 * 0: awaiting player action (play or discard)
@@ -30,6 +32,7 @@ namespace Red_7_GUI
         public List<Palette> Palettes { get { return palettes; } }
         public Deck Deck { get { return deck; } }
         public Card Canvas { get { return canvas.Peek(); } }
+        public bool CanUndo { get { if (actions.Count == 0) return false; else return true; } }
         public Client(int numPlayers, bool advanced, bool actionRule, int seed)
         {
             palettes = new List<Palette>();
@@ -39,6 +42,7 @@ namespace Red_7_GUI
             canvas = new Stack<Card>();
             actions = new Stack<Action>();
             players = numPlayers;
+            canEnd = true;
             deck.Reset(seed);
             this.advanced = advanced;
             this.actionRule = actionRule;
@@ -71,10 +75,6 @@ namespace Red_7_GUI
                 }
             }
         }
-        public void Undo()
-        {
-            //undoes the last action taken
-        }
         public void PlayToPalette(int player, int startIndex)
         {
             Card card = hands[player].GetCard(startIndex);
@@ -82,17 +82,18 @@ namespace Red_7_GUI
             hands[player].RemoveCardByIndex(startIndex);
 
             int[] endPos = new int[3];
-            gameState = 1;
 
             endPos[0] = 1;
             endPos[1] = player;
             endPos[2] = palettes[player].Size - 1;
 
-            Action action = new Action("playToPalette", card);
+            Action action = new Action("playToPalette", gameState);
             action.StartPos = new int[] { 0, player, startIndex };
             action.EndPos = endPos;
 
             actions.Push(action);
+
+            gameState = 1;
 
             switch (card.Rank)
             {
@@ -114,11 +115,14 @@ namespace Red_7_GUI
                     }
                     break;
                 case 3:
+                    action = new Action("drawCard", gameState);
+                    action.StartPos = new int[] { 0, -2, deck.Size };
+                    action.EndPos = new int[] { 0, player, hands[player].Size - 1 };
+                    action.End = false;
+                    actions.Push(action);
+
                     card = deck.DrawCard();
                     hands[player].AddCard(card);//draw a card
-                    action = new Action("drawCard", card);
-                    action.EndPos = new int[] { 0, player, hands[player].Size - 1 };
-                    actions.Push(action);
                     break;
                 case 5:
                     gameState = 0;//allows the player to play another card 
@@ -137,19 +141,27 @@ namespace Red_7_GUI
             startPos[1] = player;//discard from current player
             startPos[2] = index;//which specific card to discard
 
-            gameState = 2;
-
             Action action = DiscardCard(startPos, -1);// -1 to discard to canvas
-
             action.End = true;
 
             actions.Push(action);
+
+            gameState = 2;
+            canEnd = false;
 
             if (advanced == true)
             {
                 if (card.Rank > palettes[player].Size)
                 {
+
+                    action = new Action("drawCard", gameState);
+                    action.StartPos = new int[] { 0, -2, deck.Size };
+                    action.EndPos = new int[] { 0, player, hands[player].Size - 1 };
+                    action.End = false;
+                    actions.Push(action);
+
                     hands[player].AddCard(deck.DrawCard());//draws a card
+
                     Program.Update(-1);
                 }
             }
@@ -162,13 +174,16 @@ namespace Red_7_GUI
             startPos[1] = player;//discard from current player
             startPos[2] = index;//which specific card to discard
 
-            gameState = 1;
-
             Action action = DiscardCard(startPos, target);
 
             action.End = false;
-
             actions.Push(action);
+
+            gameState = 1;
+            if (target != player)
+            {
+                canEnd = false;
+            }
         }
         private Action DiscardCard(int[] startPos, int target)
         {
@@ -184,7 +199,7 @@ namespace Red_7_GUI
                 card = palettes[startPos[1]].GetCard(startPos[2]);
                 palettes[startPos[1]].RemoveCardByIndex(startPos[2]);
             }
-            Action action = new Action("discardCard", card);
+            Action action = new Action("discardCard", gameState);
             action.StartPos = startPos;
 
 
@@ -204,6 +219,97 @@ namespace Red_7_GUI
             }
             action.EndPos = new int[] { 1, target, targetPos };
             return action;
+        }
+        public bool TryUndo()
+        {
+            Action action = actions.Pop();
+            if (action.Type == "drawCard")
+            {
+                return false;
+            }
+            else
+            {
+                Undo(action);
+                return true;
+            }
+        }
+        private void Undo(Action action)
+        {
+            Console.WriteLine(actions.Count);
+
+            MoveCard(action.EndPos, action.StartPos);
+            gameState = action.PrevGameState;
+
+            if (action.End == false)
+            {
+                Undo(actions.Pop());
+            }
+
+            Program.Update(action.StartPos[1]);//updates start player
+            Program.Update(action.EndPos[1]);//updates end player
+            Program.Update(-1);
+        }
+        private void MoveCard(int[] startPos, int[] endPos)
+        {
+            Card card;
+            switch (startPos[1])
+            {
+                case -1://canvas
+                    card = canvas.Pop();
+                    break;
+                case -2://deck
+                    card = deck.DrawCard();
+                    break;
+                default://player
+                    if (startPos[0] == 0)
+                    {
+                        card = hands[startPos[1]].RemoveCardByIndex(startPos[2]);
+                    }
+                    else
+                    {
+                        card = palettes[startPos[1]].RemoveCardByIndex(startPos[2]);
+                    }
+                    break;
+            }
+
+            switch (endPos[1])
+            {
+                case -1://canvas
+                    canvas.Push(card);
+                    break;
+                case -2://deck
+                    deck.AddCard(card);
+                    break;
+                default://player
+                    if (endPos[0] == 0)
+                    {
+                        hands[endPos[1]].InsertCard(endPos[2], card);
+                    }
+                    else
+                    {
+                        palettes[endPos[1]].InsertCard(endPos[2], card);
+                    }
+                    break;
+            }
+        }
+        public void EndTurn(bool winning)
+        {
+            if (!winning && !canEnd)
+            {
+                while (actions.Count != 0)
+                {
+                    Undo(actions.Pop());
+                }
+            }
+
+            gameState = -1;
+            canEnd = true;
+            Program.Update(-1);
+            UpdateServer();
+        }
+        public void UpdateServer()
+        {
+
         }
         public void Debug()
         {

@@ -24,7 +24,7 @@ namespace Red_7_GUI
         }
         public static void Update(int set)//updates a hand/palette - 1 for hand, other nums for palettes
         {
-            if (set == -1)
+            if (set < 0)
             {
                 gameScreen.RedrawHand();
             }

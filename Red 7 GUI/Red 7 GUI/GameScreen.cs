@@ -281,12 +281,35 @@ namespace Red_7_GUI
         }
         private void undoButton_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Undo");
-            client.Undo();
+            if (client.CanUndo)
+            {
+                bool success = client.TryUndo();
+
+                if (!success)
+                {
+                    MessageBox.Show("Cannot undo a draw action (no cheating)");
+                }
+            }
+            else
+            {
+                MessageBox.Show("No actions to undo");
+            }
         }
         private void endTurnButton_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("End turn");
+            if (client.CheckWinner(this.player))
+            {
+                client.EndTurn(true);
+            }
+            else
+            {
+                var result = MessageBox.Show("You are not winning - are you sure you want to end your turn", "Confirm end turn", MessageBoxButtons.YesNo);
+
+                if (result == DialogResult.Yes)
+                {
+                    client.EndTurn(false);
+                }
+            }
         }
 
         private void helpButton_Click(object sender, EventArgs e)

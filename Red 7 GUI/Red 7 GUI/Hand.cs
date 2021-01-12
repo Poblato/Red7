@@ -9,14 +9,13 @@ namespace Red_7_GUI
     public class Hand
     {
         protected List<Card> hand;
-        protected int size;
 
         public Hand()
         {
             hand = new List<Card>();
         }
         public List<Card> Cards { get { return hand; } }
-        public int Size { get { return size; } }
+        public int Size { get { return hand.Count; } }
         public Card GetCard(int index)
         {
             if (index > hand.Count)
@@ -30,7 +29,7 @@ namespace Red_7_GUI
         }
         public int FindCard(Card card)
         {
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < hand.Count; i++)
             {
                 Card c = hand[i];
                 if (c.GetScore() == card.GetScore())
@@ -43,7 +42,10 @@ namespace Red_7_GUI
         public void AddCard(Card card)
         {
             hand.Add(card);
-            size++;
+        }
+        public void InsertCard(int index, Card card)
+        {
+            hand.Insert(index, card);
         }
         public void RemoveCard(Card c)
         {
@@ -53,7 +55,6 @@ namespace Red_7_GUI
         {
             Card c = GetCard(index);
             hand.RemoveAt(index);
-            size--;
             return c;
         }
     }
