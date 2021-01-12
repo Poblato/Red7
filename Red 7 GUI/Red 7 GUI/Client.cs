@@ -39,7 +39,7 @@ namespace Red_7_GUI
             canvas = new Stack<Card>();
             actions = new Stack<Action>();
             players = numPlayers;
-            deck.Reset();
+            deck.Reset(seed);
             this.advanced = advanced;
             this.actionRule = actionRule;
 

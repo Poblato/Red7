@@ -18,7 +18,8 @@ namespace Red_7_GUI
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            gameScreen = new GameScreen(4, 1, true, true);
+            Random rnd = new Random();
+            gameScreen = new GameScreen(4, 0, true, true, rnd.Next(0, 2147483647));
             Application.Run(gameScreen);
         }
         public static void Update(int set)//updates a hand/palette - 1 for hand, other nums for palettes

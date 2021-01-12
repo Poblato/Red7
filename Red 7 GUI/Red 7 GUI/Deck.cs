@@ -17,18 +17,18 @@ namespace Red_7_GUI
         {
             deck = new Card[constSize];
         }
-        public void Reset()
+        public void Reset(int seed)
         {
             size = constSize;
             for (int i = 0; i < 49; i++)
             {
                 deck[i] = new Card((i % 7) + 1, (i / 7) + 1);
             }
-            Shuffle();
+            Shuffle(seed);
         }
-        public void Shuffle()
+        public void Shuffle(int seed)
         {
-            Random rnd = new Random();
+            Random rnd = new Random(seed);
 
             for (int i = 0; i < constSize; i++)
             {
