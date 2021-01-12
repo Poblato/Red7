@@ -14,23 +14,27 @@ namespace Red_7_GUI
     {
         private Client client;
         private List<Button> playerHand;
-        private List<List<Button>> cards;
+        private List<List<Button>> palettes;
         private int cardHeight = 80;
         private int cardWidth = 60;
         private int top = 300;
         private int players;
+        private int player;
+        private int shift;
 
-        public GameScreen(int players, bool advanced, bool actionRule)
+        public GameScreen(int players, int player, bool advanced, bool actionRule, int seed)
         {
             InitializeComponent();
             this.Text = "Game: " + players.ToString() + " players";
-            client = new Client(players, advanced, actionRule);
-            cards = new List<List<Button>>();
+            client = new Client(players, advanced, actionRule, seed);
+            palettes = new List<List<Button>>();
             playerHand = new List<Button>();
             this.players = players;
+            this.player = player;
+            shift = (4 - player) % 4;
             for (int i = 0; i < players; i++)
             {
-                cards.Add(new List<Button>());
+                palettes.Add(new List<Button>());
             }
             //client.Debug();
 
@@ -88,9 +92,9 @@ namespace Red_7_GUI
             }
             playerHand.Clear();
 
-            for (int i = 0; i < client.Hands[0].Size; i++)
+            for (int i = 0; i < client.Hands[player].Size; i++)
             {
-                Card card = client.Hands[0].GetCard(i);
+                Card card = client.Hands[player].GetCard(i);
                 playerHand.Add(new Button()
                 {
                     Size = new Size(cardWidth, cardHeight),
@@ -111,18 +115,18 @@ namespace Red_7_GUI
         {
             //MessageBox.Show("Redrawing palette " + player.ToString());
             Card card;
-            foreach (Button b in cards[player])
+            foreach (Button b in palettes[player])
             {
                 b.Dispose();
             }
-            cards[player].Clear();
+            palettes[player].Clear();
 
-            if (player == 0)
+            if (player == this.player)
             {
                 for (int i = 0; i < client.Palettes[player].Size; i++)
                 {
                     card = client.Palettes[player].GetCard(i);
-                    cards[player].Add(new Button()
+                    palettes[player].Add(new Button()
                     {
                         Size = new Size(cardWidth, cardHeight),
                         Location = new Point((cardWidth + 15) * i + 60, top),
@@ -131,30 +135,31 @@ namespace Red_7_GUI
                         Text = card.GetName(),
                     });
                     // add to Form's Controls so that they show up
-                    cards[player][i].MouseDown += new MouseEventHandler(paletteCardClick);
+                    palettes[player][i].MouseDown += new MouseEventHandler(paletteCardClick);
                     // 
-                    Controls.Add(cards[player][i]);
-                    cards[player][i].BringToFront();
+                    Controls.Add(palettes[player][i]);
+                    palettes[player][i].BringToFront();
                 }
             }
             else
             {
+                int visualIndex = (player + shift) % 4;
                 for (int i = 0; i < client.Palettes[player].Size; i++)
                 {
                     card = client.Palettes[player].GetCard(i);
-                    cards[player].Add(new Button()
+                    palettes[player].Add(new Button()
                     {
                         Size = new Size(cardWidth, cardHeight),
-                        Location = new Point((cardWidth + 15) * i + 60, (player * 190) + 285),
+                        Location = new Point((cardWidth + 15) * i + 60, (visualIndex * 190) + 285),
                         BackColor = Color.LightGray,
                         ForeColor = Color.Black,
                         Text = card.GetName(),
                     });
                     // add to Form's Controls so that they show up
-                    cards[player][i].MouseDown += new MouseEventHandler(paletteCardClick);
+                    palettes[player][i].MouseDown += new MouseEventHandler(paletteCardClick);
                     // 
-                    Controls.Add(cards[player][i]);
-                    cards[player][i].BringToFront();
+                    Controls.Add(palettes[player][i]);
+                    palettes[player][i].BringToFront();
                 }
             }
             UpdateLabels();
@@ -164,11 +169,11 @@ namespace Red_7_GUI
             int player = -1;
             int index = -1;
 
-            for (int i = 0; i < cards.Count; i++)//finds index of card clicked
+            for (int i = 0; i < palettes.Count; i++)//finds index of card clicked
             {
-                for (int x = 0; x < cards[i].Count; x++)
+                for (int x = 0; x < palettes[i].Count; x++)
                 {
-                    if (sender.Equals(cards[i][x]))
+                    if (sender.Equals(palettes[i][x]))
                     {
                         player = i;
                         index = x;
@@ -184,11 +189,11 @@ namespace Red_7_GUI
 
             if (client.GameState == 3)//if discarding from other palette
             {
-                if (player == 0)
+                if (player == this.player)
                 {
                     MessageBox.Show("Cannot dicard your own card");
                 }
-                else if (cards[player].Count < cards[0].Count)
+                else if (palettes[player].Count < palettes[this.player].Count)
                 {
                     MessageBox.Show("Cannot discard from a player with less cards than you");
                 }
@@ -210,7 +215,7 @@ namespace Red_7_GUI
             }
             else if (client.GameState == 4)//if discarding from own palette
             {
-                if (player != 0)
+                if (player != this.player)
                 {
                     MessageBox.Show("Cannot dicard another player's card");
                 }
@@ -254,8 +259,8 @@ namespace Red_7_GUI
             {
                 if (client.GameState == 0)
                 {
-                    client.PlayToPalette(0, index);
-                    RedrawPalette(0);
+                    client.PlayToPalette(this.player, index);
+                    RedrawPalette(this.player);
                     RedrawHand();
                     UpdateLabels();
                     Invalidate();
@@ -265,7 +270,7 @@ namespace Red_7_GUI
             {
                 if (client.GameState == 0 || client.GameState == 1)
                 {
-                    client.DiscardToCanvas(0, index);
+                    client.DiscardToCanvas(this.player, index);
                     canvas.Text = client.Canvas.GetName();
                     RedrawHand();
                     UpdateLabels();

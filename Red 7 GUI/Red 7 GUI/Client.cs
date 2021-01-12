@@ -30,7 +30,7 @@ namespace Red_7_GUI
         public List<Palette> Palettes { get { return palettes; } }
         public Deck Deck { get { return deck; } }
         public Card Canvas { get { return canvas.Peek(); } }
-        public Client(int numPlayers, bool advanced, bool actionRule)
+        public Client(int numPlayers, bool advanced, bool actionRule, int seed)
         {
             palettes = new List<Palette>();
             hands = new List<Hand>();
