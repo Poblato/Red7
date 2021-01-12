@@ -44,6 +44,10 @@ namespace Red_7_GUI
             size--;
             return c;
         }
+        public Card GetCard(int index)
+        {
+            return deck[index];
+        }
         public void AddCard(Card card)
         {
             deck[size] = card;

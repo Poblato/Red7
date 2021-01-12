@@ -36,9 +36,10 @@ namespace Red_7_GUI
             {
                 palettes.Add(new List<Button>());
             }
-            //client.Debug();
 
             Setup();
+
+            client.Debug();
         }
         private void Setup()
         {
@@ -309,6 +310,13 @@ namespace Red_7_GUI
                 {
                     client.EndTurn(false);
                 }
+            }
+        }
+        public void RemovePlayer(int player)
+        {
+            foreach (Button b in palettes[player])
+            {
+                b.Enabled = false;
             }
         }
 

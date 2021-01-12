@@ -17,6 +17,7 @@ namespace Red_7_GUI
         private bool advanced;
         private bool actionRule;
         private Stack<Action> actions;
+        private List<int> alivePlayers;
         private bool canEnd; // if the turn can be ended or actions must be undone beforehand (to prevent a losing player changing the outcome of the game)
 
         private int gameState; /*defines the state of the client
@@ -41,6 +42,7 @@ namespace Red_7_GUI
             scorer = new Scorer();
             canvas = new Stack<Card>();
             actions = new Stack<Action>();
+            alivePlayers = new List<int>();
             players = numPlayers;
             canEnd = true;
             deck.Reset(seed);
@@ -51,6 +53,7 @@ namespace Red_7_GUI
 
             for (int i = 0; i < numPlayers; i++)
             {
+                alivePlayers.Add(i);
                 palettes.Add(new Palette());
                 hands.Add(new Hand());
             }
@@ -59,7 +62,7 @@ namespace Red_7_GUI
         }
         public bool CheckWinner(int currentPlayer)
         {
-            return scorer.Score(palettes, currentPlayer, canvas.Peek().Colour);
+            return scorer.Score(palettes, currentPlayer, canvas.Peek().Colour, alivePlayers);
         }
         private void Setup()
         {
@@ -300,21 +303,52 @@ namespace Red_7_GUI
                 {
                     Undo(actions.Pop());
                 }
+                // remove players' cards from play
             }
 
             gameState = -1;
             canEnd = true;
             Program.Update(-1);
-            UpdateServer();
+            UpdateServer(winning);
         }
-        public void UpdateServer()
+        public void UpdateServer(bool winning)
         {
+            Queue<Action> actionQueue = new Queue<Action>();
+            actions.Reverse();
 
+            for (int i = 0; i < actions.Count; i++)//empties the action stack and puts it into a queue
+            {
+                actionQueue.Enqueue(actions.Pop());
+            }
+
+            //send server actionQueue, winning
+        }
+        private void UpdateClient(Queue<Action> actionQueue, List<int> alivePlayers ,bool playerTurn) //triggers when queue of actions received from the server
+        {
+            Action action;
+            this.alivePlayers = alivePlayers;
+
+            for (int i = 0; i < actionQueue.Count; i++)
+            {
+                action = actionQueue.Dequeue();
+
+                MoveCard(action.StartPos, action.EndPos);
+            }
+
+            if (playerTurn)
+            {
+                gameState = 0;
+            }
+
+            for (int i = 0; i < players; i++)//updates the form
+            {
+                Program.Update(i);
+            }
         }
         public void Debug()
         {
-            palettes[2].AddCard(new Card(3, 5));
-            palettes[2].AddCard(new Card(6, 4));
+            alivePlayers.Remove(1);
+            Program.RemovePlayer(1);
         }
     }
 }

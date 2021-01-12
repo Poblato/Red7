@@ -12,24 +12,24 @@ namespace Red_7_GUI
 		{
 
 		}
-		public bool Score(List<Palette> palettes, int currentPlayer, int colour)
+		public bool Score(List<Palette> palettes, int currentPlayer, int colour, List<int> alivePlayers)
 		{
 			switch (colour)
 			{
 				case 1:
-					return MostCardsBelowFour(palettes, currentPlayer);
+					return MostCardsBelowFour(palettes, currentPlayer, alivePlayers);
 				case 2:
-					return MostCardsInARow(palettes, currentPlayer);
+					return MostCardsInARow(palettes, currentPlayer, alivePlayers);
 				case 3:
-					return MostDifferentColours(palettes, currentPlayer);
+					return MostDifferentColours(palettes, currentPlayer, alivePlayers);
 				case 4:
-					return MostEvenCards(palettes, currentPlayer);
+					return MostEvenCards(palettes, currentPlayer, alivePlayers);
 				case 5:
-					return MostCardsOfOneColour(palettes, currentPlayer);
+					return MostCardsOfOneColour(palettes, currentPlayer, alivePlayers);
 				case 6:
-					return MostCardsOfOneNumber(palettes, currentPlayer);
+					return MostCardsOfOneNumber(palettes, currentPlayer, alivePlayers);
 				case 7:
-					return HighestCard(palettes, currentPlayer);
+					return HighestCard(palettes, currentPlayer, alivePlayers);
 				default:
 					throw new Exception("Invalid colour on canvas");
 			}
@@ -46,13 +46,13 @@ namespace Red_7_GUI
 			}
 			return highest;
 		}
-		private bool HighestCard(List<Palette> palettes, int currentPlayer)
+		private bool HighestCard(List<Palette> palettes, int currentPlayer, List<int> alivePlayers)
 		{
 			Card highestPlayerCard = new Card(0, 0);
 			Card highestOpponentCard = new Card(0, 0);
 			Card c;
 
-			for (int i = 0; i < palettes.Count; i++)
+			foreach (int i in alivePlayers)
 			{
 				if (i == currentPlayer)
 				{
@@ -76,7 +76,7 @@ namespace Red_7_GUI
 				return false;
 			}
 		}
-		private bool MostCardsOfOneNumber(List<Palette> palettes, int currentPlayer)
+		private bool MostCardsOfOneNumber(List<Palette> palettes, int currentPlayer, List<int> alivePlayers)
 		{
 			Card playerHighestCard = new Card(0, 0);
 			Card opponentHighestCard = new Card(0, 0);
@@ -84,7 +84,7 @@ namespace Red_7_GUI
 			int opponentMostCards = 0;
 			List<Card> cards;
 
-			for (int i = 0; i < palettes.Count; i++)
+			foreach (int i in alivePlayers)
 			{
 				for (int x = 1; x < 8; x++)
 				{
@@ -116,7 +116,7 @@ namespace Red_7_GUI
 				return false;
 			}
 		}
-		private bool MostCardsOfOneColour(List<Palette> palettes, int currentPlayer)
+		private bool MostCardsOfOneColour(List<Palette> palettes, int currentPlayer, List<int> alivePlayers)
 		{
 			Card playerHighestCard = new Card(0, 0);
 			Card opponentHighestCard = new Card(0, 0);
@@ -124,7 +124,7 @@ namespace Red_7_GUI
 			int opponentMostCards = 0;
 			List<Card> cards;
 
-			for (int i = 0; i < palettes.Count; i++)
+			foreach (int i in alivePlayers)
 			{
 				for (int x = 1; x < 8; x++)
 				{
@@ -156,7 +156,7 @@ namespace Red_7_GUI
 				return false;
 			}
 		}
-		private bool MostEvenCards(List<Palette> palettes, int currentPlayer)
+		private bool MostEvenCards(List<Palette> palettes, int currentPlayer, List<int> alivePlayers)
 		{
 			Card playerHighestCard = new Card(0, 0);
 			Card opponentHighestCard = new Card(0, 0);
@@ -164,7 +164,7 @@ namespace Red_7_GUI
 			int playerEvenCards = 0;
 			int opponentEvenCards = 0;
 
-			for (int i = 0; i < palettes.Count; i++)
+			foreach (int i in alivePlayers)
 			{
 				cards = palettes[i].GetEvenCards();
 				if (currentPlayer == i)
@@ -190,18 +190,18 @@ namespace Red_7_GUI
 				return false;
 			}
 		}
-		private bool MostDifferentColours(List<Palette> palettes, int currentPlayer)
+		private bool MostDifferentColours(List<Palette> palettes, int currentPlayer, List<int> alivePlayers)
 		{
 			Card playerHighestCard = new Card(0, 0);
 			Card opponentHighestCard = new Card(0, 0);
 			int playerColours = 0;
 			int opponentColours = 0;
 			List<int> colours = new List<int>();
-			for (int i = 0; i < palettes.Count; i++)
+			foreach (int i in alivePlayers)
 			{
 				if (i == currentPlayer)
 				{
-					for (int x = 0; x < palettes[i].Size; i++)
+					for (int x = 0; x < palettes[i].Size; x++)
 					{
 						if (!colours.Contains(palettes[i].GetCard(x).Colour))
 						{
@@ -213,7 +213,7 @@ namespace Red_7_GUI
 				}
 				else
 				{
-					for (int x = 0; x < palettes[i].Size; i++)
+					for (int x = 0; x < palettes[i].Size; x++)
 					{
 						if (!colours.Contains(palettes[i].GetCard(x).Colour))
 						{
@@ -237,7 +237,7 @@ namespace Red_7_GUI
 				return false;
 			}
 		}
-		private bool MostCardsInARow(List<Palette> palettes, int currentPlayer)
+		private bool MostCardsInARow(List<Palette> palettes, int currentPlayer, List<int> alivePlayers)
 		{
 			Card playerHighestCard = new Card(0, 0);
 			Card opponentHighestCard = new Card(0, 0);
@@ -245,7 +245,7 @@ namespace Red_7_GUI
 			int playerCardsInARow = 0;
 			int opponentCardsInARow = 0;
 
-			for (int i = 0; i < palettes.Count; i++)
+			foreach (int i in alivePlayers)
 			{
 				cards = palettes[i].FindLongestRun();
 				if (i == currentPlayer)
@@ -271,7 +271,7 @@ namespace Red_7_GUI
 				return false;
 			}
 		}
-		private bool MostCardsBelowFour(List<Palette> palettes, int currentPlayer)
+		private bool MostCardsBelowFour(List<Palette> palettes, int currentPlayer, List<int> alivePlayers)
 		{
 			Card playerHighestCard = new Card(0, 0);
 			Card opponentHighestCard = new Card(0, 0);
@@ -279,7 +279,7 @@ namespace Red_7_GUI
 			int playerCards = 0;
 			int opponentCards = 0;
 
-			for (int i = 0; i < palettes.Count; i++)
+			foreach (int i in alivePlayers)
 			{
 				cards = palettes[i].GetCardsBelowFour();
 				if (currentPlayer == i)

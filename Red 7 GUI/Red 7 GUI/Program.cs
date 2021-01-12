@@ -33,5 +33,9 @@ namespace Red_7_GUI
                 gameScreen.RedrawPalette(set);
             }
         }
+        public static void RemovePlayer(int player)
+        {
+            gameScreen.RemovePlayer(player);
+        }
     }
 }
