@@ -57,6 +57,18 @@
       <DependentUpon>GameScreen.cs</DependentUpon>
     </Compile>
     <Compile Include="Hand.cs" />
+    <Compile Include="LobbyScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LobbyScreen.Designer.cs">
+      <DependentUpon>LobbyScreen.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MenuScreen.Designer.cs">
+      <DependentUpon>MenuScreen.cs</DependentUpon>
+    </Compile>
     <Compile Include="Palette.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -64,6 +76,12 @@
     <Compile Include="Server.cs" />
     <EmbeddedResource Include="GameScreen.resx">
       <DependentUpon>GameScreen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LobbyScreen.resx">
+      <DependentUpon>LobbyScreen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MenuScreen.resx">
+      <DependentUpon>MenuScreen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -340,7 +340,7 @@ namespace Red_7_GUI
                 gameState = 0;
             }
 
-            for (int i = 0; i < players; i++)//updates the form
+            foreach (int i in alivePlayers)//updates the form
             {
                 Program.Update(i);
             }

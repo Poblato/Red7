@@ -39,7 +39,7 @@ namespace Red_7_GUI
 
             Setup();
 
-            client.Debug();
+            //client.Debug();
         }
         private void Setup()
         {
@@ -264,7 +264,6 @@ namespace Red_7_GUI
                     RedrawPalette(this.player);
                     RedrawHand();
                     UpdateLabels();
-                    Invalidate();
                 }
             }
             else if (e.Button == MouseButtons.Right)//discard to canvas
@@ -275,7 +274,6 @@ namespace Red_7_GUI
                     canvas.Text = client.Canvas.GetName();
                     RedrawHand();
                     UpdateLabels();
-                    Invalidate();
                 }
             }
             //MessageBox.Show(client.GameState.ToString());
