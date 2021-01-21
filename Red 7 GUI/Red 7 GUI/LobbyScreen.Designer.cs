@@ -29,19 +29,200 @@ namespace Red_7_GUI
         /// </summary>
         private void InitializeComponent()
         {
+            this.player0Panel = new System.Windows.Forms.Panel();
+            this.label1 = new System.Windows.Forms.Label();
+            this.player1Panel = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
+            this.player2Panel = new System.Windows.Forms.Panel();
+            this.label3 = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.label4 = new System.Windows.Forms.Label();
+            this.advancedCheckBox = new System.Windows.Forms.CheckBox();
+            this.actionCheckBox = new System.Windows.Forms.CheckBox();
+            this.startButton = new System.Windows.Forms.Button();
+            this.quitButton = new System.Windows.Forms.Button();
+            this.helpButton = new System.Windows.Forms.Button();
+            this.player0Panel.SuspendLayout();
+            this.player1Panel.SuspendLayout();
+            this.player2Panel.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // player0Panel
+            // 
+            this.player0Panel.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.player0Panel.Controls.Add(this.label1);
+            this.player0Panel.Location = new System.Drawing.Point(20, 20);
+            this.player0Panel.Name = "player0Panel";
+            this.player0Panel.Size = new System.Drawing.Size(500, 75);
+            this.player0Panel.TabIndex = 0;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F);
+            this.label1.ForeColor = System.Drawing.Color.Cornsilk;
+            this.label1.Location = new System.Drawing.Point(15, 15);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(230, 39);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "player0 (Host)";
+            // 
+            // player1Panel
+            // 
+            this.player1Panel.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.player1Panel.Controls.Add(this.label2);
+            this.player1Panel.Location = new System.Drawing.Point(20, 115);
+            this.player1Panel.Name = "player1Panel";
+            this.player1Panel.Size = new System.Drawing.Size(500, 75);
+            this.player1Panel.TabIndex = 1;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F);
+            this.label2.ForeColor = System.Drawing.Color.Cornsilk;
+            this.label2.Location = new System.Drawing.Point(15, 18);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(129, 39);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "player1";
+            // 
+            // player2Panel
+            // 
+            this.player2Panel.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.player2Panel.Controls.Add(this.label3);
+            this.player2Panel.Location = new System.Drawing.Point(20, 210);
+            this.player2Panel.Name = "player2Panel";
+            this.player2Panel.Size = new System.Drawing.Size(500, 75);
+            this.player2Panel.TabIndex = 2;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F);
+            this.label3.ForeColor = System.Drawing.Color.Cornsilk;
+            this.label3.Location = new System.Drawing.Point(15, 16);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(129, 39);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "player2";
+            // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.panel1.Controls.Add(this.label4);
+            this.panel1.Location = new System.Drawing.Point(20, 305);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(500, 75);
+            this.panel1.TabIndex = 3;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F);
+            this.label4.ForeColor = System.Drawing.Color.Cornsilk;
+            this.label4.Location = new System.Drawing.Point(15, 16);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(129, 39);
+            this.label4.TabIndex = 3;
+            this.label4.Text = "player3";
+            // 
+            // advancedCheckBox
+            // 
+            this.advancedCheckBox.AutoSize = true;
+            this.advancedCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
+            this.advancedCheckBox.Location = new System.Drawing.Point(578, 98);
+            this.advancedCheckBox.Name = "advancedCheckBox";
+            this.advancedCheckBox.Size = new System.Drawing.Size(120, 29);
+            this.advancedCheckBox.TabIndex = 4;
+            this.advancedCheckBox.Text = "Advanced";
+            this.advancedCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // actionCheckBox
+            // 
+            this.actionCheckBox.AutoSize = true;
+            this.actionCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
+            this.actionCheckBox.Location = new System.Drawing.Point(578, 32);
+            this.actionCheckBox.Name = "actionCheckBox";
+            this.actionCheckBox.Size = new System.Drawing.Size(130, 29);
+            this.actionCheckBox.TabIndex = 5;
+            this.actionCheckBox.Text = "Action Rule";
+            this.actionCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // startButton
+            // 
+            this.startButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
+            this.startButton.Location = new System.Drawing.Point(555, 308);
+            this.startButton.Name = "startButton";
+            this.startButton.Size = new System.Drawing.Size(200, 72);
+            this.startButton.TabIndex = 6;
+            this.startButton.Text = "Start Game";
+            this.startButton.UseVisualStyleBackColor = true;
+            // 
+            // quitButton
+            // 
+            this.quitButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
+            this.quitButton.Location = new System.Drawing.Point(578, 213);
+            this.quitButton.Name = "quitButton";
+            this.quitButton.Size = new System.Drawing.Size(177, 72);
+            this.quitButton.TabIndex = 7;
+            this.quitButton.Text = "Quit";
+            this.quitButton.UseVisualStyleBackColor = true;
+            // 
+            // helpButton
+            // 
+            this.helpButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
+            this.helpButton.Location = new System.Drawing.Point(720, 155);
+            this.helpButton.Name = "helpButton";
+            this.helpButton.Size = new System.Drawing.Size(35, 35);
+            this.helpButton.TabIndex = 8;
+            this.helpButton.Text = "?";
+            this.helpButton.UseVisualStyleBackColor = true;
             // 
             // LobbyScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1017, 637);
+            this.ClientSize = new System.Drawing.Size(788, 400);
+            this.Controls.Add(this.helpButton);
+            this.Controls.Add(this.quitButton);
+            this.Controls.Add(this.startButton);
+            this.Controls.Add(this.actionCheckBox);
+            this.Controls.Add(this.advancedCheckBox);
+            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.player2Panel);
+            this.Controls.Add(this.player1Panel);
+            this.Controls.Add(this.player0Panel);
             this.Name = "LobbyScreen";
             this.Text = "LobbyScreen";
+            this.player0Panel.ResumeLayout(false);
+            this.player0Panel.PerformLayout();
+            this.player1Panel.ResumeLayout(false);
+            this.player1Panel.PerformLayout();
+            this.player2Panel.ResumeLayout(false);
+            this.player2Panel.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
+
+        private System.Windows.Forms.Panel player0Panel;
+        private System.Windows.Forms.Panel player1Panel;
+        private System.Windows.Forms.Panel player2Panel;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.CheckBox advancedCheckBox;
+        private System.Windows.Forms.CheckBox actionCheckBox;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button startButton;
+        private System.Windows.Forms.Button quitButton;
+        private System.Windows.Forms.Button helpButton;
     }
 }
