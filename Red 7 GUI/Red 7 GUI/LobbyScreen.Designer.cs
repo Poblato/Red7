@@ -30,13 +30,13 @@ namespace Red_7_GUI
         private void InitializeComponent()
         {
             this.player0Panel = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
+            this.player0Label = new System.Windows.Forms.Label();
             this.player1Panel = new System.Windows.Forms.Panel();
-            this.label2 = new System.Windows.Forms.Label();
+            this.player1Label = new System.Windows.Forms.Label();
             this.player2Panel = new System.Windows.Forms.Panel();
-            this.label3 = new System.Windows.Forms.Label();
+            this.player2Label = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.label4 = new System.Windows.Forms.Label();
+            this.player3Label = new System.Windows.Forms.Label();
             this.advancedCheckBox = new System.Windows.Forms.CheckBox();
             this.actionCheckBox = new System.Windows.Forms.CheckBox();
             this.startButton = new System.Windows.Forms.Button();
@@ -51,82 +51,82 @@ namespace Red_7_GUI
             // player0Panel
             // 
             this.player0Panel.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.player0Panel.Controls.Add(this.label1);
+            this.player0Panel.Controls.Add(this.player0Label);
             this.player0Panel.Location = new System.Drawing.Point(20, 20);
             this.player0Panel.Name = "player0Panel";
             this.player0Panel.Size = new System.Drawing.Size(500, 75);
             this.player0Panel.TabIndex = 0;
             // 
-            // label1
+            // player0Label
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F);
-            this.label1.ForeColor = System.Drawing.Color.Cornsilk;
-            this.label1.Location = new System.Drawing.Point(15, 15);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(230, 39);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "player0 (Host)";
+            this.player0Label.AutoSize = true;
+            this.player0Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F);
+            this.player0Label.ForeColor = System.Drawing.Color.Cornsilk;
+            this.player0Label.Location = new System.Drawing.Point(15, 15);
+            this.player0Label.Name = "player0Label";
+            this.player0Label.Size = new System.Drawing.Size(230, 39);
+            this.player0Label.TabIndex = 0;
+            this.player0Label.Text = "player0 (Host)";
             // 
             // player1Panel
             // 
             this.player1Panel.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.player1Panel.Controls.Add(this.label2);
+            this.player1Panel.Controls.Add(this.player1Label);
             this.player1Panel.Location = new System.Drawing.Point(20, 115);
             this.player1Panel.Name = "player1Panel";
             this.player1Panel.Size = new System.Drawing.Size(500, 75);
             this.player1Panel.TabIndex = 1;
             // 
-            // label2
+            // player1Label
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F);
-            this.label2.ForeColor = System.Drawing.Color.Cornsilk;
-            this.label2.Location = new System.Drawing.Point(15, 18);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(129, 39);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "player1";
+            this.player1Label.AutoSize = true;
+            this.player1Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F);
+            this.player1Label.ForeColor = System.Drawing.Color.Cornsilk;
+            this.player1Label.Location = new System.Drawing.Point(15, 18);
+            this.player1Label.Name = "player1Label";
+            this.player1Label.Size = new System.Drawing.Size(129, 39);
+            this.player1Label.TabIndex = 1;
+            this.player1Label.Text = "player1";
             // 
             // player2Panel
             // 
             this.player2Panel.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.player2Panel.Controls.Add(this.label3);
+            this.player2Panel.Controls.Add(this.player2Label);
             this.player2Panel.Location = new System.Drawing.Point(20, 210);
             this.player2Panel.Name = "player2Panel";
             this.player2Panel.Size = new System.Drawing.Size(500, 75);
             this.player2Panel.TabIndex = 2;
             // 
-            // label3
+            // player2Label
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F);
-            this.label3.ForeColor = System.Drawing.Color.Cornsilk;
-            this.label3.Location = new System.Drawing.Point(15, 16);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(129, 39);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "player2";
+            this.player2Label.AutoSize = true;
+            this.player2Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F);
+            this.player2Label.ForeColor = System.Drawing.Color.Cornsilk;
+            this.player2Label.Location = new System.Drawing.Point(15, 16);
+            this.player2Label.Name = "player2Label";
+            this.player2Label.Size = new System.Drawing.Size(129, 39);
+            this.player2Label.TabIndex = 2;
+            this.player2Label.Text = "player2";
             // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.panel1.Controls.Add(this.label4);
+            this.panel1.Controls.Add(this.player3Label);
             this.panel1.Location = new System.Drawing.Point(20, 305);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(500, 75);
             this.panel1.TabIndex = 3;
             // 
-            // label4
+            // player3Label
             // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F);
-            this.label4.ForeColor = System.Drawing.Color.Cornsilk;
-            this.label4.Location = new System.Drawing.Point(15, 16);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(129, 39);
-            this.label4.TabIndex = 3;
-            this.label4.Text = "player3";
+            this.player3Label.AutoSize = true;
+            this.player3Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F);
+            this.player3Label.ForeColor = System.Drawing.Color.Cornsilk;
+            this.player3Label.Location = new System.Drawing.Point(15, 16);
+            this.player3Label.Name = "player3Label";
+            this.player3Label.Size = new System.Drawing.Size(129, 39);
+            this.player3Label.TabIndex = 3;
+            this.player3Label.Text = "player3";
             // 
             // advancedCheckBox
             // 
@@ -159,6 +159,7 @@ namespace Red_7_GUI
             this.startButton.TabIndex = 6;
             this.startButton.Text = "Start Game";
             this.startButton.UseVisualStyleBackColor = true;
+            this.startButton.Click += new System.EventHandler(this.startButton_Click);
             // 
             // quitButton
             // 
@@ -169,6 +170,7 @@ namespace Red_7_GUI
             this.quitButton.TabIndex = 7;
             this.quitButton.Text = "Quit";
             this.quitButton.UseVisualStyleBackColor = true;
+            this.quitButton.Click += new System.EventHandler(this.quitButton_Click);
             // 
             // helpButton
             // 
@@ -179,6 +181,7 @@ namespace Red_7_GUI
             this.helpButton.TabIndex = 8;
             this.helpButton.Text = "?";
             this.helpButton.UseVisualStyleBackColor = true;
+            this.helpButton.Click += new System.EventHandler(this.helpButton_Click);
             // 
             // LobbyScreen
             // 
@@ -217,10 +220,10 @@ namespace Red_7_GUI
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.CheckBox advancedCheckBox;
         private System.Windows.Forms.CheckBox actionCheckBox;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label player0Label;
+        private System.Windows.Forms.Label player1Label;
+        private System.Windows.Forms.Label player2Label;
+        private System.Windows.Forms.Label player3Label;
         private System.Windows.Forms.Button startButton;
         private System.Windows.Forms.Button quitButton;
         private System.Windows.Forms.Button helpButton;

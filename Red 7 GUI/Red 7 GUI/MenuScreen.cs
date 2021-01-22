@@ -29,7 +29,7 @@ namespace Red_7_GUI
             else
             {
                 Hide();
-                LobbyScreen lobby = new LobbyScreen(true, "-1");
+                LobbyScreen lobby = new LobbyScreen(true, "-1", usernameTextBox.Text);
                 lobby.ShowDialog(this);
                 Show();
             }
@@ -45,10 +45,12 @@ namespace Red_7_GUI
                 var ipPopup = new IPPopup();
                 ipPopup.ShowDialog(this);
                 string ip = ipPopup.ip;
+                ipPopup.Dispose();
+
                 if (ip != string.Empty)
                 {
                     Hide();
-                    LobbyScreen lobby = new LobbyScreen(false, ip);
+                    LobbyScreen lobby = new LobbyScreen(false, ip, usernameTextBox.Text);
                     lobby.ShowDialog(this);
                     Show();
                 }

@@ -9,18 +9,31 @@ namespace Red_7_GUI
     public class Server
     {
         private int players;
+        private string[] playerNames;
         private List<int> alivePlayers;
         private int currentPlayerIndex;
-        public Server(int players, int seed, bool advanced, bool actionRule)
+        bool actionRule;
+        bool advanced;
+        public Server(string hostName)
+        {
+            playerNames = new string[4];
+            alivePlayers = new List<int>();
+            actionRule = false;
+            advanced = false;
+
+            playerNames[0] = hostName;
+            players++;
+        }
+        public void SetupGame(int players, int seed)
         {
             this.players = players;
-            alivePlayers = new List<int>();
             for (int i = 0; i < players; i++)
             {
                 alivePlayers.Add(i);
             }
+
             FindFirstPlayer(seed);
-            CreateClients(advanced, actionRule, seed);
+            CreateClients(seed);
         }
         private void FindFirstPlayer(int seed)
         {
@@ -45,7 +58,7 @@ namespace Red_7_GUI
 
             currentPlayerIndex = startingPlayer;
         }
-        private void CreateClients(bool advanced, bool actionRule, int seed)
+        private void CreateClients(int seed)
         {
             //send to lobby files to create client
             //tell first player to take turn
@@ -70,9 +83,23 @@ namespace Red_7_GUI
                 }
                 else
                 {
-                    //send actionQueueu, players remaining
+                    //send actionQueue, players remaining
                 }
             }
+        }
+        private void PlayerJoined(string username)//triggers when a player joins the lobby
+        {
+            playerNames[players] = username;
+            players++;
+            //send all players player list
+            //send new player rules
+        }
+        private void RulesChanged(bool newActionRule, bool newAdvanced)//triggers when host changed lobby rules
+        {
+            actionRule = newActionRule;
+            advanced = newAdvanced;
+
+            //update lobbies
         }
     }
 }
