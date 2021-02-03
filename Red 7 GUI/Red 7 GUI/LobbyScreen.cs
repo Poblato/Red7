@@ -32,7 +32,7 @@ namespace Red_7_GUI
             }
             else
             {
-                Server server = new Server();
+                Server server = new Server("-1");
                 players[0] = username;
             }
 

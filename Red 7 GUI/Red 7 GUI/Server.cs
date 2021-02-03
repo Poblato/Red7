@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
+using System.Net.Sockets;
 
 namespace Red_7_GUI
 {
@@ -12,6 +14,7 @@ namespace Red_7_GUI
         private string[] playerNames;
         private List<int> alivePlayers;
         private int currentPlayerIndex;
+        private bool gameStarted;
         bool actionRule;
         bool advanced;
         public Server(string hostName)
@@ -20,6 +23,7 @@ namespace Red_7_GUI
             alivePlayers = new List<int>();
             actionRule = false;
             advanced = false;
+            gameStarted = false;
 
             playerNames[0] = hostName;
             players++;
@@ -100,6 +104,95 @@ namespace Red_7_GUI
             advanced = newAdvanced;
 
             //update lobbies
+        }
+        private void StartServer()
+        {
+            // Get Host IP Address that is used to establish a connection  
+            // In this case, we get one IP address of localhost that is IP : 127.0.0.1  
+            // If a host has multiple addresses, you will get a list of addresses  
+            IPHostEntry host = Dns.GetHostEntry("localhost");
+            IPAddress ipAddress = host.AddressList[0];
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
+
+
+            try
+            {
+                // Create a Socket that will use Tcp protocol      
+                Socket listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                // A Socket must be associated with an endpoint using the Bind method  
+                listener.Bind(localEndPoint);
+                // Specify how many requests a Socket can listen before it gives Server busy response.  
+                // We will listen 10 requests at a time  
+                listener.Listen(10);
+
+                Socket handler = listener.Accept();
+
+                // Incoming data from the client.    
+                string data = null;
+                byte[] bytes = null;
+
+                while (true)
+                {
+                    bytes = new byte[1024];
+                    int bytesRec = handler.Receive(bytes);
+                    data += Encoding.ASCII.GetString(bytes, 0, bytesRec);
+                    if (data.IndexOf("<EOF>") > -1)
+                    {
+                        Decode(data);
+                        bytes = new byte[1024];
+                        data = string.Empty;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                
+            }
+        }
+        private void Decode(string raw)
+        {
+            char[] chars = raw.ToCharArray();
+
+            switch (chars[0])
+            {
+                case '0'://join lobby
+                    if (!gameStarted)
+                    {
+                        string username = string.Empty;
+                        for (int i = 1; i < chars.Length; i++)
+                        {
+                            username += chars[i];
+                        }
+
+                        PlayerJoined(username);
+                    }
+                    break;
+                case '1'://leave lobbby
+                    break;
+                case '2'://update rule
+                    if (!gameStarted)
+                    {
+                        if (chars[1] == '0')//advanced
+                        {
+                            advanced = !advanced;
+                        }
+                        else if (chars[1] == '1')//action rule
+                        {
+                            actionRule = !actionRule;
+                        }
+                    }
+                    break;
+                case '3'://end turn
+                    break;
+                case '4':
+                    break;
+                default:
+                    throw new Exception("");
+            }
+        }
+        private void Encode()
+        {
+
         }
     }
 }
