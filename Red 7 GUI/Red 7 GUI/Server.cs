@@ -12,14 +12,17 @@ namespace Red_7_GUI
     {
         private int players;
         private string[] playerNames;
+        private List<IPEndPoint> iPAddresses;
         private List<int> alivePlayers;
         private int currentPlayerIndex;
         private bool gameStarted;
+        private int port = 56565;
         bool actionRule;
         bool advanced;
         public Server(string hostName)
         {
             playerNames = new string[4];
+            iPAddresses = new List<IPEndPoint>();
             alivePlayers = new List<int>();
             actionRule = false;
             advanced = false;
@@ -27,6 +30,8 @@ namespace Red_7_GUI
 
             playerNames[0] = hostName;
             players++;
+
+
         }
         public void SetupGame(int players, int seed)
         {
@@ -67,7 +72,159 @@ namespace Red_7_GUI
             //send to lobby files to create client
             //tell first player to take turn
         }
-        private void UpdateClients(Queue<Action> actionQueue, bool winning, int sender)//triggers when update received from a client
+        private void StartServer()
+        {
+            // Get Host IP Address that is used to establish a connection  
+            IPHostEntry host = Dns.GetHostEntry("localhost");
+            IPAddress ipAddress = host.AddressList[0];
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
+            iPAddresses.Add(localEndPoint);
+            
+
+            try
+            {
+                // Create a Socket that will use Tcp protocol
+                Socket listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                // A Socket must be associated with an endpoint using the Bind method
+                listener.Bind(localEndPoint);
+                // Specify how many requests a Socket can listen before it gives Server busy response.
+                // We will listen 10 requests at a time
+                listener.Listen(10);
+
+                Socket handler = listener.Accept();
+
+                // Incoming data from the client.
+                string data = null;
+                byte[] bytes = null;
+
+                while (true)
+                {
+
+                    bytes = new byte[1024];
+                    int bytesRec = handler.Receive(bytes);
+                    data += Encoding.ASCII.GetString(bytes, 0, bytesRec);
+                    if (data.IndexOf("<EOF>") > -1)
+                    {
+                        Decode(data, handler);
+                        bytes = new byte[1024];
+                        data = string.Empty;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                
+            }
+        }
+        private void Decode(string raw, Socket handler)
+        {
+            char[] chars = raw.ToCharArray();
+
+            switch (chars[0])
+            {
+                case '0'://join lobby
+                    PlayerJoined(handler, chars);
+                    break;
+                case '1'://leave lobbby
+                    PlayerLeft(chars);
+                    break;
+                case '2'://update rule
+                    UpdateRule(chars);
+                    break;
+                case '3'://end turn
+                    break;
+                case '4':
+                    break;
+                default:
+                    throw new Exception("");
+            }
+        }
+        private void PlayerJoined(Socket handler, char[] chars)//triggers when a player joins the lobby
+        {
+            if (!gameStarted)
+            {
+                IPEndPoint newUser = (IPEndPoint)handler.RemoteEndPoint;
+                iPAddresses.Add(newUser);
+                string username = string.Empty;
+
+                for (int i = 1; i < chars.Length; i++)
+                {
+                    username += chars[i];
+                }
+
+                playerNames[players] = username;
+                players++;
+            }
+            else
+            {
+                //send error message
+            }
+            //send all players player list
+            
+            //send new player rules
+            byte[] data = new byte[1024];
+            string msg = "2"; //rule update
+
+            if (advanced)
+            {
+                msg += "1";
+            }
+            else
+            {
+                msg += "0";
+            }
+            if (actionRule)
+            {
+                msg += "1";
+            }
+            else
+            {
+                msg += "0";
+            }
+
+            data = Encoding.ASCII.GetBytes(msg);
+
+            handler.Send(data);
+        }
+        private void PlayerLeft(char[] chars)
+        {
+
+        }
+        private void UpdateRule(char[] chars)
+        {
+            if (!gameStarted)
+            {
+                if (chars[1] == '0')//advanced
+                {
+                    advanced = false;
+                }
+                else
+                {
+                    advanced = true;
+                }
+                if (chars[2] == '0')//action rule
+                {
+                    actionRule = false;
+                }
+                else
+                {
+                    actionRule = true;
+                }
+
+                string data = string.Empty;
+
+                foreach (char c in chars)
+                {
+                    data += c;
+                }
+
+                for (int i = 1; i < players; i++)//sends rule update to every client except the host
+                {
+                    SendToClient(data, i);
+                }
+            }
+        }
+        private void EndTurn(Queue<Action> actionQueue, bool winning, int sender)//triggers when update received from a client
         {
             if (!winning)
             {
@@ -91,108 +248,57 @@ namespace Red_7_GUI
                 }
             }
         }
-        private void PlayerJoined(string username)//triggers when a player joins the lobby
+        private void SendToClient(string data, int client)
         {
-            playerNames[players] = username;
-            players++;
-            //send all players player list
-            //send new player rules
-        }
-        private void RulesChanged(bool newActionRule, bool newAdvanced)//triggers when host changed lobby rules
-        {
-            actionRule = newActionRule;
-            advanced = newAdvanced;
-
-            //update lobbies
-        }
-        private void StartServer()
-        {
-            // Get Host IP Address that is used to establish a connection  
-            // In this case, we get one IP address of localhost that is IP : 127.0.0.1  
-            // If a host has multiple addresses, you will get a list of addresses  
-            IPHostEntry host = Dns.GetHostEntry("localhost");
-            IPAddress ipAddress = host.AddressList[0];
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
-
+            byte[] bytes = new byte[1024];
 
             try
             {
-                // Create a Socket that will use Tcp protocol      
-                Socket listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                // A Socket must be associated with an endpoint using the Bind method  
-                listener.Bind(localEndPoint);
-                // Specify how many requests a Socket can listen before it gives Server busy response.  
-                // We will listen 10 requests at a time  
-                listener.Listen(10);
+                IPEndPoint remoteEP = iPAddresses[client];
+                // Create a TCP/IP  socket
+                Socket sender = new Socket(remoteEP.Address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
-                Socket handler = listener.Accept();
-
-                // Incoming data from the client.    
-                string data = null;
-                byte[] bytes = null;
-
-                while (true)
+                // Connect the socket to the remote endpoint. Catch any errors
+                try
                 {
-                    bytes = new byte[1024];
-                    int bytesRec = handler.Receive(bytes);
-                    data += Encoding.ASCII.GetString(bytes, 0, bytesRec);
-                    if (data.IndexOf("<EOF>") > -1)
+                    sender.Connect(remoteEP);
+
+                    // Encode the data string into a byte array 
+                    byte[] msg = Encoding.ASCII.GetBytes(data + "<EOF>");
+
+                    // Send the data through the socket 
+                    int bytesSent = sender.Send(msg);
+
+                    // Receive the response from the remote device
+                    int bytesRec = sender.Receive(bytes);
+
+                    // Close the socket
+                    sender.Shutdown(SocketShutdown.Both);
+                    sender.Close();
+
+                    if (bytesRec != default)
                     {
-                        Decode(data);
-                        bytes = new byte[1024];
-                        data = string.Empty;
+                        //might be useful later
                     }
                 }
+                catch (ArgumentNullException ane)
+                {
+                    Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
+                }
+                catch (SocketException se)
+                {
+                    Console.WriteLine("SocketException : {0}", se.ToString());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Unexpected exception : {0}", e.ToString());
+                }
+
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                
+                Console.WriteLine(e.ToString());
             }
-        }
-        private void Decode(string raw)
-        {
-            char[] chars = raw.ToCharArray();
-
-            switch (chars[0])
-            {
-                case '0'://join lobby
-                    if (!gameStarted)
-                    {
-                        string username = string.Empty;
-                        for (int i = 1; i < chars.Length; i++)
-                        {
-                            username += chars[i];
-                        }
-
-                        PlayerJoined(username);
-                    }
-                    break;
-                case '1'://leave lobbby
-                    break;
-                case '2'://update rule
-                    if (!gameStarted)
-                    {
-                        if (chars[1] == '0')//advanced
-                        {
-                            advanced = !advanced;
-                        }
-                        else if (chars[1] == '1')//action rule
-                        {
-                            actionRule = !actionRule;
-                        }
-                    }
-                    break;
-                case '3'://end turn
-                    break;
-                case '4':
-                    break;
-                default:
-                    throw new Exception("");
-            }
-        }
-        private void Encode()
-        {
-
         }
     }
 }
