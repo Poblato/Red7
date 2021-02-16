@@ -78,11 +78,19 @@ namespace Red_7_GUI
         {
             if (host)
             {
-                //close server
+                numClients = 4;
+                Thread.Sleep(100);
+                clients = default;
+                readers = default;
+                writers = default;
+                serverPlayers = default;
             }
             else
             {
-                //send disconnect message
+                send = "1";
+                this.sender.RunWorkerAsync();
+                Thread.Sleep(200);
+                send = "";
             }
             Close();
         }
@@ -185,16 +193,15 @@ namespace Red_7_GUI
         private TcpClient[] clients;
         private StreamReader[] readers;
         private StreamWriter[] writers;
-        private BackgroundWorker[] threads;
         private string[] serverPlayers;
         private int numClients;
+        private int currentPlayerIndex;
         private void StartServer()
         {
             serverPlayers = new string[4];
             clients = new TcpClient[4];
             readers = new StreamReader[4];
             writers = new StreamWriter[4];
-            threads = new BackgroundWorker[4];
             numClients = 0;
 
             listener.RunWorkerAsync();
@@ -209,6 +216,7 @@ namespace Red_7_GUI
         }
         private void startServerButton_Click(object sender, EventArgs e)
         {
+            numClients = 0;
             startButton.Enabled = true;
             startServerButton.Enabled = false;
             StartServer();
@@ -224,14 +232,10 @@ namespace Red_7_GUI
                 writers[numClients] = new StreamWriter(clients[numClients].GetStream());
                 writers[numClients].AutoFlush = true;
 
-                //threads[numClients] = new BackgroundWorker();
-                //threads[numClients].WorkerSupportsCancellation = true;
-                //threads[numClients].DoWork += new DoWorkEventHandler(cReceiver);
-                //threads[numClients].RunWorkerAsync();
-
                 numClients++;
             }
             listener.Stop();
+            listener = null;
             this.listener.CancelAsync();
         }
         private void cReceiver(object sender, DoWorkEventArgs e)
@@ -305,11 +309,10 @@ namespace Red_7_GUI
                         try
                         {
                             receive = readers[i].ReadLine();
-                            if (receive != "")
+                            if (receive != null)
                             {
                                 MessageBox.Show(receive + " from " + i.ToString());
                                 ServerDecode(receive, i);
-                                receive = "";
                             }
                         }
                         catch (Exception ex)
@@ -319,6 +322,29 @@ namespace Red_7_GUI
                     }
                 }
             }
+        }
+        private void FindFirstPlayer(int seed)
+        {
+            Deck deck = new Deck();
+            deck.Reset(seed);
+            Card lowestCard = new Card(7, 7);
+            int startingPlayer = -1;
+
+            for (int i = 0; i < numClients; i++)
+            {
+                if (deck.GetCard(i).GetScore() < lowestCard.GetScore())
+                {
+                    lowestCard = deck.GetCard(i);
+                    startingPlayer = i;
+                }
+            }
+
+            if (startingPlayer == -1)
+            {
+                throw new Exception("lowest card not found - no card lower than red 7");
+            }
+
+            currentPlayerIndex = startingPlayer;
         }
         #endregion
     }

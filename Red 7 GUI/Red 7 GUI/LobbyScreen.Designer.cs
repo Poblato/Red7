@@ -215,7 +215,6 @@ namespace Red_7_GUI
             // 
             // serverReceiver
             // 
-            this.serverReceiver.WorkerSupportsCancellation = true;
             this.serverReceiver.DoWork += new System.ComponentModel.DoWorkEventHandler(this.serverReceiver_DoWork);
             // 
             // LobbyScreen
