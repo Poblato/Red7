@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Net;
 
 namespace Red_7_GUI
 {
@@ -28,9 +29,13 @@ namespace Red_7_GUI
             }
             else
             {
+                IPHostEntry host = Dns.GetHostEntry("localhost");
+                IPAddress ipAddress = host.AddressList[0];
+
                 Hide();
-                LobbyScreen lobby = new LobbyScreen(true, "-1", usernameTextBox.Text);
+                LobbyScreen lobby = new LobbyScreen(true, ipAddress, usernameTextBox.Text);
                 lobby.ShowDialog(this);
+                lobby.Dispose();
                 Show();
             }
         }
@@ -44,14 +49,19 @@ namespace Red_7_GUI
             {
                 var ipPopup = new IPPopup();
                 ipPopup.ShowDialog(this);
-                string ip = ipPopup.ip;
+                IPAddress ip = ipPopup.ip;
                 ipPopup.Dispose();
 
-                if (ip != string.Empty)
+                if (ip != default)
                 {
                     Hide();
                     LobbyScreen lobby = new LobbyScreen(false, ip, usernameTextBox.Text);
-                    lobby.ShowDialog(this);
+                    try
+                    {
+                        lobby.ShowDialog(this);
+                    }
+                    catch (Exception) { };
+                    lobby.Dispose();
                     Show();
                 }
             }

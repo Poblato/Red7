@@ -42,6 +42,10 @@ namespace Red_7_GUI
             this.startButton = new System.Windows.Forms.Button();
             this.quitButton = new System.Windows.Forms.Button();
             this.helpButton = new System.Windows.Forms.Button();
+            this.sender = new System.ComponentModel.BackgroundWorker();
+            this.startServerButton = new System.Windows.Forms.Button();
+            this.receiver = new System.ComponentModel.BackgroundWorker();
+            this.listener = new System.ComponentModel.BackgroundWorker();
             this.player0Panel.SuspendLayout();
             this.player1Panel.SuspendLayout();
             this.player2Panel.SuspendLayout();
@@ -183,11 +187,37 @@ namespace Red_7_GUI
             this.helpButton.UseVisualStyleBackColor = true;
             this.helpButton.Click += new System.EventHandler(this.helpButton_Click);
             // 
+            // sender
+            // 
+            this.sender.WorkerSupportsCancellation = true;
+            this.sender.DoWork += new System.ComponentModel.DoWorkEventHandler(this.sender_DoWork);
+            // 
+            // startServerButton
+            // 
+            this.startServerButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.startServerButton.Location = new System.Drawing.Point(590, 143);
+            this.startServerButton.Name = "startServerButton";
+            this.startServerButton.Size = new System.Drawing.Size(107, 46);
+            this.startServerButton.TabIndex = 9;
+            this.startServerButton.Text = "Start server";
+            this.startServerButton.UseVisualStyleBackColor = true;
+            this.startServerButton.Click += new System.EventHandler(this.startServerButton_Click);
+            // 
+            // receiver
+            // 
+            this.receiver.DoWork += new System.ComponentModel.DoWorkEventHandler(this.receiver_DoWork);
+            // 
+            // listener
+            // 
+            this.listener.WorkerSupportsCancellation = true;
+            this.listener.DoWork += new System.ComponentModel.DoWorkEventHandler(this.listener_DoWork);
+            // 
             // LobbyScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(788, 400);
+            this.Controls.Add(this.startServerButton);
             this.Controls.Add(this.helpButton);
             this.Controls.Add(this.quitButton);
             this.Controls.Add(this.startButton);
@@ -227,5 +257,9 @@ namespace Red_7_GUI
         private System.Windows.Forms.Button startButton;
         private System.Windows.Forms.Button quitButton;
         private System.Windows.Forms.Button helpButton;
+        private System.ComponentModel.BackgroundWorker sender;
+        private System.Windows.Forms.Button startServerButton;
+        private System.ComponentModel.BackgroundWorker receiver;
+        private System.ComponentModel.BackgroundWorker listener;
     }
 }
