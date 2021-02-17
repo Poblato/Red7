@@ -42,7 +42,6 @@ namespace Red_7_GUI
             this.startButton = new System.Windows.Forms.Button();
             this.quitButton = new System.Windows.Forms.Button();
             this.helpButton = new System.Windows.Forms.Button();
-            this.sender = new System.ComponentModel.BackgroundWorker();
             this.startServerButton = new System.Windows.Forms.Button();
             this.receiver = new System.ComponentModel.BackgroundWorker();
             this.listener = new System.ComponentModel.BackgroundWorker();
@@ -188,11 +187,6 @@ namespace Red_7_GUI
             this.helpButton.UseVisualStyleBackColor = true;
             this.helpButton.Click += new System.EventHandler(this.helpButton_Click);
             // 
-            // sender
-            // 
-            this.sender.WorkerSupportsCancellation = true;
-            this.sender.DoWork += new System.ComponentModel.DoWorkEventHandler(this.sender_DoWork);
-            // 
             // startServerButton
             // 
             this.startServerButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
@@ -215,6 +209,7 @@ namespace Red_7_GUI
             // 
             // serverReceiver
             // 
+            this.serverReceiver.WorkerSupportsCancellation = true;
             this.serverReceiver.DoWork += new System.ComponentModel.DoWorkEventHandler(this.serverReceiver_DoWork);
             // 
             // LobbyScreen
@@ -262,7 +257,6 @@ namespace Red_7_GUI
         private System.Windows.Forms.Button startButton;
         private System.Windows.Forms.Button quitButton;
         private System.Windows.Forms.Button helpButton;
-        private System.ComponentModel.BackgroundWorker sender;
         private System.Windows.Forms.Button startServerButton;
         private System.ComponentModel.BackgroundWorker receiver;
         private System.ComponentModel.BackgroundWorker listener;
