@@ -27,6 +27,10 @@ namespace Red_7_GUI
             {
                 MessageBox.Show("Please enter a username");
             }
+            else if (usernameTextBox.Text.Contains("~"))
+            {
+                MessageBox.Show("Names cannot contain ~");
+            }
             else
             {
                 IPHostEntry host = Dns.GetHostEntry("localhost");
@@ -44,6 +48,10 @@ namespace Red_7_GUI
             if (usernameTextBox.Text == string.Empty)
             {
                 MessageBox.Show("Please enter a username");
+            }
+            else if (usernameTextBox.Text.Contains("~"))
+            {
+                MessageBox.Show("Names cannot contain ~");
             }
             else
             {

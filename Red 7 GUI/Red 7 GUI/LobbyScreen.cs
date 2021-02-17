@@ -33,7 +33,6 @@ namespace Red_7_GUI
             gameStarted = false;
             InitializeComponent();
             startButton.Enabled = false;
-            UpdateLabels();
 
             if (!host)
             {
@@ -49,6 +48,8 @@ namespace Red_7_GUI
                 }
 
                 ClientSend("0" + username);
+
+                receiver.RunWorkerAsync();//starts receiver
             }
             else
             {
@@ -62,10 +63,19 @@ namespace Red_7_GUI
         #region Lobby
         private void UpdateLabels()
         {
-            player0Label.Text = clientPlayers[0] + " (host)";
-            player1Label.Text = clientPlayers[1];
-            player2Label.Text = clientPlayers[2];
-            player3Label.Text = clientPlayers[3];
+            //ensures that this is called from the main thread - winforms does not support multithreaded access to components
+            this.player0Label.Invoke((MethodInvoker)delegate {
+                this.player0Label.Text = clientPlayers[0] + " (host)";
+            });
+            this.player1Label.Invoke((MethodInvoker)delegate {
+                this.player1Label.Text = clientPlayers[1];
+            });
+            this.player2Label.Invoke((MethodInvoker)delegate {
+                this.player2Label.Text = clientPlayers[2];
+            });
+            this.player3Label.Invoke((MethodInvoker)delegate {
+                this.player3Label.Text = clientPlayers[3];
+            });
         }
         private void helpButton_Click(object sender, EventArgs e)
         {
@@ -85,6 +95,7 @@ namespace Red_7_GUI
             }
             else
             {
+                MessageBox.Show("sending leave message");
                 ClientSend("1");
             }
             Close();
@@ -115,7 +126,6 @@ namespace Red_7_GUI
                     STR = new StreamReader(client.GetStream());
                     STW.AutoFlush = true;
 
-                    receiver.RunWorkerAsync();
                     return true;
                 }
             }
@@ -132,7 +142,7 @@ namespace Red_7_GUI
             if (client.Connected)
             {
                 STW.WriteLine(data);
-                MessageBox.Show("Sent " + data);
+                //MessageBox.Show("Sent " + data);
             }
         }
         private void receiver_DoWork(object sender, DoWorkEventArgs e)
@@ -144,7 +154,7 @@ namespace Red_7_GUI
                     receive = STR.ReadLine();
                     if (receive != "")
                     {
-                        MessageBox.Show("Received " + receive);
+                        //MessageBox.Show("Received " + receive);
                         ClientDecode(receive);
                         receive = "";
                     }
@@ -157,15 +167,23 @@ namespace Red_7_GUI
         }
         private void ClientDecode(string data)//triggers when a player joins the lobby
         {
-            ClientLabelUpdate labels = new ClientLabelUpdate(UpdateLabels);
             switch (data[0])
             {
                 case '0'://join (username)
-                    clientPlayers[numPlayers] = data.Substring(1);
+                    clientPlayers = data.Substring(1).Split('~');
                     numPlayers++;
-                    labels.Invoke();
+                    UpdateLabels();
                     break;
                 case '1'://leave
+                    MessageBox.Show("client received leave message");
+                    try
+                    {
+                        CPlayerLeft((int)data[1]);
+                    }
+                    catch(Exception e)
+                    {
+                        MessageBox.Show("Leaving player not integer");
+                    }
                     break;
                 case '2'://rule update
                     break;
@@ -178,7 +196,15 @@ namespace Red_7_GUI
                     break;
             }
         }
-        private delegate void ClientLabelUpdate();
+        private void CPlayerLeft(int player)
+        {
+            numPlayers--;
+            for (int i = player; i < numPlayers; i++)
+            {
+                clientPlayers[i] = clientPlayers[i + 1];
+            }
+            UpdateLabels();
+        }
         #endregion
         #region Server
         private TcpClient[] clients;
@@ -198,6 +224,7 @@ namespace Red_7_GUI
             serverReceiver.RunWorkerAsync();
 
             ConnectToServer();//connects host to the server
+            receiver.RunWorkerAsync();
             numPlayers = 1;
 
             ClientSend("0" + username);
@@ -226,24 +253,41 @@ namespace Red_7_GUI
         }
         private void ServerDecode(string data, int clientNum)//triggers when a player joins the lobby
         {
+            string msg;
             switch (data[0])
             {
                 case '0'://join (username)
                     serverPlayers[clientNum] = data.Substring(1);
 
+                    msg = "0";
+
+                    foreach(string name in serverPlayers)
+                    {
+                        msg += name + "~";
+                    }
+
                     for (int i = 0; i < numClients; i++)
                     {
-                        if (i != clientNum)
+                        if (clients[i].Connected)
                         {
-                            if (clients[i].Connected)
-                            {
-                                MessageBox.Show("sending " + data + " to " + i.ToString());
-                                writers[i].WriteLine(data);//sends data to client i
-                            }
+                            //MessageBox.Show("sending " + msg + " to " + i.ToString());
+                            writers[i].WriteLine(msg);//sends data to client i
                         }
                     }
                     break;
                 case '1'://leave
+                    MessageBox.Show("server received leave message");
+                    SPlayerLeft(clientNum);
+                    msg = "1" + clientNum.ToString();
+
+                    for (int i = 0; i < numClients; i++)
+                    {
+                        if (clients[i].Connected)
+                        {
+                            //MessageBox.Show("sending " + msg + " to " + i.ToString());
+                            writers[i].WriteLine(msg);//sends data to client i
+                        }
+                    }
                     break;
                 case '2'://rule update
                     break;
@@ -272,7 +316,7 @@ namespace Red_7_GUI
                             {
                                 //MessageBox.Show("data detected");
                                 receive = readers[i].ReadLine();
-                                MessageBox.Show(receive + " from " + i.ToString());
+                                //MessageBox.Show(receive + " from " + i.ToString());
                                 ServerDecode(receive, i);
                             }
                         }
@@ -282,6 +326,16 @@ namespace Red_7_GUI
                         }
                     }
                 }
+            }
+        }
+        private void SPlayerLeft(int player)//removes a players connection server-side
+        {
+            numClients--;
+            for (int i = player; i < numClients; i++)
+            {
+                clients[i] = clients[i + 1];
+                readers[i] = readers[i + 1];
+                writers[i] = writers[i + 1];
             }
         }
         private void FindFirstPlayer(int seed)
