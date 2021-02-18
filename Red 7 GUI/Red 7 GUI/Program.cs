@@ -12,31 +12,22 @@ namespace Red_7_GUI
         /// The main entry point for the application.
         /// </summary>
         
-        static private GameScreen gameScreen;
+        static private MenuScreen menu;
         [STAThread]
         static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            //Random rnd = new Random();
-            //gameScreen = new GameScreen(4, 0, true, true, rnd.Next(0, 2147483647));
-            //Application.Run(gameScreen);
-            Application.Run(new MenuScreen());
+            menu = new MenuScreen();
+            Application.Run(menu);
         }
         public static void Update(int set)//updates a hand/palette - 1 for hand, other nums for palettes
         {
-            if (set < 0)
-            {
-                gameScreen.RedrawHand();
-            }
-            else
-            {
-                gameScreen.RedrawPalette(set);
-            }
+            menu.Update(set);
         }
         public static void RemovePlayer(int player)
         {
-            gameScreen.RemovePlayer(player);
+            menu.RemovePlayer(player);
         }
     }
 }

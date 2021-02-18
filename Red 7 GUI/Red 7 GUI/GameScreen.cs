@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Net;
+using System.Net.Sockets;
 
 namespace Red_7_GUI
 {
@@ -22,7 +24,7 @@ namespace Red_7_GUI
         private int player;
         private int shift;
 
-        public GameScreen(int players, int player, bool advanced, bool actionRule, int seed)
+        public GameScreen(int players, int player, bool advanced, bool actionRule, int seed, bool start, TcpClient tcpClient)
         {
             InitializeComponent();
             this.Text = "Game: " + players.ToString() + " players";
@@ -37,12 +39,17 @@ namespace Red_7_GUI
                 palettes.Add(new List<Button>());
             }
 
-            Setup();
+            Setup(start);
 
             //client.Debug();
         }
-        private void Setup()
-        {
+        private void Setup(bool start)
+        {            
+            if (!start)
+            {
+                client.GameState = -1;
+            }
+
             RedrawHand();
             for (int i = 0; i < players; i++)
             {
@@ -54,8 +61,14 @@ namespace Red_7_GUI
             canvas.Text = client.Canvas.GetName();
             deckCardsLabel.Text = "Cards Left: " + client.Deck.Size.ToString();
             opponent1HandButton.Text = "Hand: " + client.Hands[1].Size.ToString();
-            opponent2HandButton.Text = "Hand: " + client.Hands[2].Size.ToString();
-            opponent3HandButton.Text = "Hand: " + client.Hands[3].Size.ToString();
+            if (players > 2)
+            {
+                opponent2HandButton.Text = "Hand: " + client.Hands[2].Size.ToString();
+                if (player > 3)
+                {
+                    opponent3HandButton.Text = "Hand: " + client.Hands[3].Size.ToString();
+                }
+            }
             UpdateActionLabel();
         }
         private void UpdateActionLabel()

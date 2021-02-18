@@ -13,6 +13,7 @@ namespace Red_7_GUI
 {
     public partial class MenuScreen : Form
     {
+        LobbyScreen lobby;
         public MenuScreen()
         {
             InitializeComponent();
@@ -37,7 +38,7 @@ namespace Red_7_GUI
                 IPAddress ipAddress = host.AddressList[0];
 
                 Hide();
-                LobbyScreen lobby = new LobbyScreen(true, ipAddress, usernameTextBox.Text);
+                lobby = new LobbyScreen(true, ipAddress, usernameTextBox.Text);
                 lobby.ShowDialog(this);
                 lobby.Dispose();
                 Show();
@@ -63,7 +64,7 @@ namespace Red_7_GUI
                 if (ip != default)
                 {
                     Hide();
-                    LobbyScreen lobby = new LobbyScreen(false, ip, usernameTextBox.Text);
+                    lobby = new LobbyScreen(false, ip, usernameTextBox.Text);
                     try
                     {
                         lobby.ShowDialog(this);
@@ -73,6 +74,15 @@ namespace Red_7_GUI
                     Show();
                 }
             }
+        }
+
+        public void Update(int set)
+        {
+            lobby.Update(set);
+        }
+        public void RemovePlayer(int player)
+        {
+            lobby.RemovePlayer(player);
         }
     }
 }

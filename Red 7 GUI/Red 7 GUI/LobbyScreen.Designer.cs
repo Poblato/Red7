@@ -44,8 +44,6 @@ namespace Red_7_GUI
             this.helpButton = new System.Windows.Forms.Button();
             this.startServerButton = new System.Windows.Forms.Button();
             this.receiver = new System.ComponentModel.BackgroundWorker();
-            this.listener = new System.ComponentModel.BackgroundWorker();
-            this.serverReceiver = new System.ComponentModel.BackgroundWorker();
             this.player0Panel.SuspendLayout();
             this.player1Panel.SuspendLayout();
             this.player2Panel.SuspendLayout();
@@ -202,17 +200,8 @@ namespace Red_7_GUI
             // 
             // receiver
             // 
+            this.receiver.WorkerSupportsCancellation = true;
             this.receiver.DoWork += new System.ComponentModel.DoWorkEventHandler(this.receiver_DoWork);
-            // 
-            // listener
-            // 
-            this.listener.WorkerSupportsCancellation = true;
-            this.listener.DoWork += new System.ComponentModel.DoWorkEventHandler(this.listener_DoWork);
-            // 
-            // serverReceiver
-            // 
-            this.serverReceiver.WorkerSupportsCancellation = true;
-            this.serverReceiver.DoWork += new System.ComponentModel.DoWorkEventHandler(this.serverReceiver_DoWork);
             // 
             // LobbyScreen
             // 
@@ -261,7 +250,5 @@ namespace Red_7_GUI
         private System.Windows.Forms.Button helpButton;
         private System.Windows.Forms.Button startServerButton;
         private System.ComponentModel.BackgroundWorker receiver;
-        private System.ComponentModel.BackgroundWorker listener;
-        private System.ComponentModel.BackgroundWorker serverReceiver;
     }
 }

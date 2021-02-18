@@ -28,7 +28,7 @@ namespace Red_7_GUI
                                 * 3: select card to discard from other player palette (triggers when 1 played and action rule is enabled)
                                 * 4: select card to discard from own palette (triggers when 7 played and action rule is enabled)
                                 */
-        public int GameState { get { return gameState; } }
+        public int GameState { get { return gameState; } set { gameState = value; } }
         public List<Hand> Hands { get { return hands; } }
         public List<Palette> Palettes { get { return palettes; } }
         public Deck Deck { get { return deck; } }
