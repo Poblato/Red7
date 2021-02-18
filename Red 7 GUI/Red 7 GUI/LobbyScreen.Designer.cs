@@ -142,6 +142,7 @@ namespace Red_7_GUI
             this.advancedCheckBox.TabIndex = 4;
             this.advancedCheckBox.Text = "Advanced";
             this.advancedCheckBox.UseVisualStyleBackColor = true;
+            this.advancedCheckBox.CheckedChanged += new System.EventHandler(this.advancedCheckBox_CheckedChanged);
             // 
             // actionCheckBox
             // 
@@ -153,6 +154,7 @@ namespace Red_7_GUI
             this.actionCheckBox.TabIndex = 5;
             this.actionCheckBox.Text = "Action Rule";
             this.actionCheckBox.UseVisualStyleBackColor = true;
+            this.actionCheckBox.CheckedChanged += new System.EventHandler(this.actionCheckBox_CheckedChanged);
             // 
             // startButton
             // 

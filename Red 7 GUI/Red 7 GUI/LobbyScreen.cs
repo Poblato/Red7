@@ -77,6 +77,15 @@ namespace Red_7_GUI
                 this.player3Label.Text = clientPlayers[3];
             });
         }
+        private void UpdateRules()
+        {
+            this.advancedCheckBox.Invoke((MethodInvoker)delegate {
+                this.advancedCheckBox.Checked = advanced;
+            });
+            this.actionCheckBox.Invoke((MethodInvoker)delegate {
+                this.actionCheckBox.Checked = actionRule;
+            });
+        }
         private void helpButton_Click(object sender, EventArgs e)
         {
             //open lobby help window
@@ -102,7 +111,21 @@ namespace Red_7_GUI
         }
         private void startButton_Click(object sender, EventArgs e)
         {
+            Random rnd = new Random();
+            int seed = rnd.Next(0, 2147483647);//generates a random seed for the game
+            FindFirstPlayer(seed);//finds the starting player
+
             //start game
+        }
+        private void actionCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            actionRule = actionCheckBox.Checked;
+            ServerDecode("2", 0);//tells the server that rules have changed
+        }
+        private void advancedCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            advanced = advancedCheckBox.Checked;
+            ServerDecode("2", 0);//tells the server that rules have changed
         }
         #endregion
         #region Client
@@ -121,7 +144,7 @@ namespace Red_7_GUI
                 client.Connect(remoteEndpoint);
                 if (client.Connected)
                 {
-                    MessageBox.Show("Connected to server");
+                    //MessageBox.Show("Connected to server");
                     STW = new StreamWriter(client.GetStream());
                     STR = new StreamReader(client.GetStream());
                     STW.AutoFlush = true;
@@ -154,7 +177,7 @@ namespace Red_7_GUI
                     receive = STR.ReadLine();
                     if (receive != "")
                     {
-                        //MessageBox.Show("Received " + receive);
+                        MessageBox.Show("Received " + receive);
                         ClientDecode(receive);
                         receive = "";
                     }
@@ -186,10 +209,29 @@ namespace Red_7_GUI
                     }
                     break;
                 case '2'://rule update
+                    if (data[1] == '0')//advanced
+                    {
+                        advanced = false;
+                    }
+                    else
+                    {
+                        advanced = true;
+                    }
+                    if (data[2] == '0')
+                    {
+                        actionRule = false;
+                    }
+                    else
+                    {
+                        actionRule = true;
+                    }
+                    UpdateRules();
                     break;
                 case '3'://end turn
                     break;
-                case '4'://
+                case '4'://start game
+                    break;
+                case '5'://
                     break;
                 default:
                     MessageBox.Show("Invalid transmission type at server");
@@ -254,6 +296,7 @@ namespace Red_7_GUI
         private void ServerDecode(string data, int clientNum)//triggers when a player joins the lobby
         {
             string msg;
+            string msg2;
             switch (data[0])
             {
                 case '0'://join (username)
@@ -274,6 +317,34 @@ namespace Red_7_GUI
                             writers[i].WriteLine(msg);//sends data to client i
                         }
                     }
+
+                    msg2 = "2";
+
+                    if (advanced)
+                    {
+                        msg2 += "1";
+                    }
+                    else
+                    {
+                        msg2 += "0";
+                    }
+                    if (actionRule)
+                    {
+                        msg2 += "1";
+                    }
+                    else
+                    {
+                        msg2 += "0";
+                    }
+
+                    for (int i = 1; i < numClients; i++)//send to all except host
+                    {
+                        if (clients[i].Connected)
+                        {
+                            //MessageBox.Show("sending " + msg2 + " to " + i.ToString());
+                            writers[i].WriteLine(msg2);//sends data to client i
+                        }
+                    }
                     break;
                 case '1'://leave
                     MessageBox.Show("server received leave message");
@@ -290,6 +361,33 @@ namespace Red_7_GUI
                     }
                     break;
                 case '2'://rule update
+                    msg = "2";
+
+                    if (advanced)
+                    {
+                        msg += "1";
+                    }
+                    else
+                    {
+                        msg += "0";
+                    }
+                    if (actionRule)
+                    {
+                        msg += "1";
+                    }
+                    else
+                    {
+                        msg += "0";
+                    }
+
+                    for (int i = 1; i < numClients; i++)//send to all except host
+                    {
+                        if (clients[i].Connected)
+                        {
+                            //MessageBox.Show("sending " + msg2 + " to " + i.ToString());
+                            writers[i].WriteLine(msg);//sends data to client i
+                        }
+                    }
                     break;
                 case '3'://end turn
                     break;
@@ -309,14 +407,14 @@ namespace Red_7_GUI
                 {
                     if (clients[i].Connected)
                     {
-                        //MessageBox.Show("Client " + i.ToString() + " is connected");//this runs
+                        //MessageBox.Show("Client " + i.ToString() + " is connected");
                         try
                         {
                             if (readers[i].Peek() != -1)
                             {
                                 //MessageBox.Show("data detected");
                                 receive = readers[i].ReadLine();
-                                //MessageBox.Show(receive + " from " + i.ToString());
+                                MessageBox.Show(receive + " from " + i.ToString());
                                 ServerDecode(receive, i);
                             }
                         }
@@ -331,7 +429,7 @@ namespace Red_7_GUI
         private void SPlayerLeft(int player)//removes a players connection server-side
         {
             numClients--;
-            for (int i = player; i < numClients; i++)
+            for (int i = player; i < numClients; i++)//moves all items after the player back one
             {
                 clients[i] = clients[i + 1];
                 readers[i] = readers[i + 1];
