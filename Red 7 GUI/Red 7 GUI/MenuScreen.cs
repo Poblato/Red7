@@ -84,5 +84,9 @@ namespace Red_7_GUI
         {
             lobby.Show();
         }
+        public void Display(string msg)
+        {
+            lobby.Display(msg);
+        }
     }
 }

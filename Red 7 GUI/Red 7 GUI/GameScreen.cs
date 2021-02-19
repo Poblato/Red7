@@ -30,7 +30,7 @@ namespace Red_7_GUI
         {
             InitializeComponent();
             this.Text = "Game: " + players.ToString() + " players";
-            client = new Client(players, advanced, actionRule, seed);
+            client = new Client(players, advanced, actionRule, seed, ref tcpClient, ref STW, ref STR);
             palettes = new List<List<Button>>();
             playerHand = new List<Button>();
             this.players = players;
@@ -337,7 +337,10 @@ namespace Red_7_GUI
         {
             foreach (Button b in palettes[player])
             {
-                b.Enabled = false;
+                this.Invoke((MethodInvoker)delegate {
+                    b.Enabled = false;
+                });
+
             }
         }
 
@@ -350,6 +353,10 @@ namespace Red_7_GUI
         {
             Program.ReturnToLobby();
             Close();
+        }
+        public void Display(string msg)
+        {
+            MessageBox.Show(msg);
         }
     }
 }

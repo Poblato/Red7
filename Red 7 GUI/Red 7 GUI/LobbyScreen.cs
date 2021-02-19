@@ -289,7 +289,7 @@ namespace Red_7_GUI
                 case '5'://
                     break;
                 default:
-                    MessageBox.Show("Invalid transmission type at server");
+                    MessageBox.Show("Invalid transmission type at client");
                     break;
             }
         }
@@ -574,5 +574,10 @@ namespace Red_7_GUI
             }
         }
         #endregion
+
+        public void Display(string msg)
+        {
+            game.Display(msg);
+        } 
     }
 }

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Red_7_GUI
@@ -28,13 +31,18 @@ namespace Red_7_GUI
                                 * 3: select card to discard from other player palette (triggers when 1 played and action rule is enabled)
                                 * 4: select card to discard from own palette (triggers when 7 played and action rule is enabled)
                                 */
+
+        TcpClient client;
+        StreamWriter STW;
+        StreamReader STR;
+        Thread receiver;
         public int GameState { get { return gameState; } set { gameState = value; } }
         public List<Hand> Hands { get { return hands; } }
         public List<Palette> Palettes { get { return palettes; } }
         public Deck Deck { get { return deck; } }
         public Card Canvas { get { return canvas.Peek(); } }
         public bool CanUndo { get { if (actions.Count == 0) return false; else return true; } }
-        public Client(int numPlayers, bool advanced, bool actionRule, int seed)
+        public Client(int numPlayers, bool advanced, bool actionRule, int seed, ref TcpClient tcpClient, ref StreamWriter STW, ref StreamReader STR)
         {
             palettes = new List<Palette>();
             hands = new List<Hand>();
@@ -42,6 +50,9 @@ namespace Red_7_GUI
             scorer = new Scorer();
             canvas = new Stack<Card>();
             actions = new Stack<Action>();
+            client = tcpClient;
+            this.STW = STW;
+            this.STR = STR;
             alivePlayers = new List<int>();
             players = numPlayers;
             canEnd = true;
@@ -57,6 +68,9 @@ namespace Red_7_GUI
                 palettes.Add(new Palette());
                 hands.Add(new Hand());
             }
+
+            receiver = new Thread(Receive);
+            receiver.Start();
 
             Setup();
         }
@@ -321,7 +335,7 @@ namespace Red_7_GUI
                 actionQueue.Enqueue(actions.Pop());
             }
 
-            //send server actionQueue, winning
+            //send server winning, actionQueue
         }
         private void UpdateClient(Queue<Action> actionQueue, List<int> alivePlayers ,bool playerTurn) //triggers when queue of actions received from the server
         {
@@ -344,6 +358,70 @@ namespace Red_7_GUI
             {
                 Program.Update(i);
             }
+        }
+        private void Receive()
+        {
+            string receive;
+            while (client.Connected)
+            {
+                try
+                {
+                    receive = STR.ReadLine();
+                    Program.Display("Received " + receive);
+                    Decode(receive);
+                }
+                catch (Exception e)
+                {
+                    Program.Display(e.ToString());
+                }
+            }
+        }
+        private void Send(string data)
+        {
+            if (client.Connected)
+            {
+                STW.WriteLine(data);
+                //MessageBox.Show("Sent " + data);
+            }
+        }
+        private void Decode(string data)
+        {
+            switch (data[0])
+            {
+                case '0'://join
+                    Program.Display("Join request during game");
+                    break;
+                case '1'://leave
+                         //MessageBox.Show("client received leave message");
+                    try
+                    {
+                        PlayerLeft(int.Parse(data[1].ToString()));
+                    }
+                    catch (Exception e)
+                    {
+                        Program.Display(e.ToString());
+                    }
+                    break;
+                case '2'://rule update
+                    Program.Display("Rule change request during game");
+                    break;
+                case '3'://end turn
+                    break;
+                case '4'://start game
+                    Program.Display("Start game request during game");
+                    break;
+                case '5'://
+                    break;
+                default:
+                    Program.Display("Invalid transmission type at client");
+                    break;
+            }
+        }
+        private void PlayerLeft(int player)
+        {
+            //MessageBox.Show(numPlayers.ToString());
+            alivePlayers.Remove(player);
+            Program.RemovePlayer(player);
         }
         public void Debug()
         {

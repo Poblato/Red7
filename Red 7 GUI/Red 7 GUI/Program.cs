@@ -33,5 +33,9 @@ namespace Red_7_GUI
         {
             menu.ReturnToLobby();
         }
+        public static void Display(string msg)
+        {
+            menu.Display(msg);
+        }
     }
 }
