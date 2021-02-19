@@ -137,7 +137,6 @@ namespace Red_7_GUI
                 FindFirstPlayer(seed);//finds the starting player
 
                 StartGame(seed);
-                //start game
             }
             else
             {
@@ -217,7 +216,14 @@ namespace Red_7_GUI
             {
                 case '0'://join
                     clientPlayers = data.Substring(1).Split('~');
-                    numPlayers++;
+                    numPlayers = 0;
+                    foreach (string s in clientPlayers)
+                    {
+                        if (s != string.Empty)
+                        {
+                            numPlayers++;
+                        }
+                    }
                     UpdateLabels();
                     break;
                 case '1'://leave
@@ -272,9 +278,13 @@ namespace Red_7_GUI
                         MessageBox.Show("Invalid seed: " + e.ToString());
                     }
                     receiver.CancelAsync();
-                    STW.Dispose();
-                    STR.Dispose();
-                    game = new GameScreen(numPlayers, FindPlayerNum(), advanced, actionRule, seed, start, client);
+
+                    this.Invoke((MethodInvoker)delegate {
+                        game = new GameScreen(numPlayers, FindPlayerNum(), clientPlayers, advanced, actionRule, seed, start, ref client, ref STW, ref STR);
+                        this.Hide();
+                        game.Show();
+                    });
+
                     break;
                 case '5'://
                     break;
@@ -344,11 +354,13 @@ namespace Red_7_GUI
         {
             TcpListener listener = new TcpListener(IPAddress.Any, port);
             listener.Start();
+            //MessageBox.Show("listening for new connections");
+
             while (numClients < 4 && !gameStarted)
             {
-
+                //MessageBox.Show("next conn");
                 clients[numClients] = listener.AcceptTcpClient();
-                if (!gameStarted)
+                if (gameStarted)
                 {
                     clients[numClients].Close();
                     break;
@@ -359,7 +371,7 @@ namespace Red_7_GUI
                 receivers[numClients] = new Thread(ServerReceive);
 
                 receivers[numClients].Start(numClients);
-
+                //MessageBox.Show("Client " + numClients.ToString() + " connected");
                 numClients++;
             }
             listener.Stop();
@@ -470,10 +482,11 @@ namespace Red_7_GUI
                     MessageBox.Show("Invalid transmission type at server");
                     break;
             }
+
         }
         private void ServerReceive(Object obj)
         {
-            int client = -1;
+            int client;
             try
             {
                 client = (int)obj;
@@ -487,12 +500,12 @@ namespace Red_7_GUI
             {
                 if (clients[client].Connected)
                 {
-                    //MessageBox.Show("Client " + i.ToString() + " is connected");
+                    //MessageBox.Show("Client " + client.ToString() + " is connected");
                     try
                     {
                         //MessageBox.Show("data detected");
                         receive = readers[client].ReadLine();
-                        if (receive != "")
+                        if (!char.IsWhiteSpace(receive[0]))
                         {
                             MessageBox.Show(receive + " from " + client.ToString());
                             ServerDecode(receive, client);

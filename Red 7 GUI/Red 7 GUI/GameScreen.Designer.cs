@@ -56,6 +56,7 @@ namespace Red_7_GUI
             this.deck = new System.Windows.Forms.Button();
             this.helpButton = new System.Windows.Forms.Button();
             this.actionLabel = new System.Windows.Forms.Label();
+            this.quitButton = new System.Windows.Forms.Button();
             this.playerPanel.SuspendLayout();
             this.playerPalettePanel.SuspendLayout();
             this.playerHandPanel.SuspendLayout();
@@ -348,11 +349,23 @@ namespace Red_7_GUI
             this.actionLabel.TabIndex = 9;
             this.actionLabel.Text = "Wating for other player(s)...";
             // 
+            // quitButton
+            // 
+            this.quitButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
+            this.quitButton.Location = new System.Drawing.Point(1153, 790);
+            this.quitButton.Name = "quitButton";
+            this.quitButton.Size = new System.Drawing.Size(143, 73);
+            this.quitButton.TabIndex = 10;
+            this.quitButton.Text = "Quit";
+            this.quitButton.UseVisualStyleBackColor = true;
+            this.quitButton.Click += new System.EventHandler(this.quitButton_Click);
+            // 
             // GameScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1344, 987);
+            this.Controls.Add(this.quitButton);
             this.Controls.Add(this.actionLabel);
             this.Controls.Add(this.helpButton);
             this.Controls.Add(this.deckCanvasPanel);
@@ -415,6 +428,7 @@ namespace Red_7_GUI
         private System.Windows.Forms.Button opponent2HandButton;
         private System.Windows.Forms.Button opponent3HandButton;
         private System.Windows.Forms.Label actionLabel;
+        private System.Windows.Forms.Button quitButton;
     }
 }
 

@@ -29,5 +29,9 @@ namespace Red_7_GUI
         {
             menu.RemovePlayer(player);
         }
+        public static void ReturnToLobby()
+        {
+            menu.ReturnToLobby();
+        }
     }
 }

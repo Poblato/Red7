@@ -39,9 +39,7 @@ namespace Red_7_GUI
 
                 Hide();
                 lobby = new LobbyScreen(true, ipAddress, usernameTextBox.Text);
-                lobby.ShowDialog(this);
-                lobby.Dispose();
-                Show();
+                lobby.Show();
             }
         }
         private void joinGameButton_Click(object sender, EventArgs e)
@@ -67,11 +65,9 @@ namespace Red_7_GUI
                     lobby = new LobbyScreen(false, ip, usernameTextBox.Text);
                     try
                     {
-                        lobby.ShowDialog(this);
+                        lobby.Show();
                     }
                     catch (Exception) { };
-                    lobby.Dispose();
-                    Show();
                 }
             }
         }
@@ -83,6 +79,10 @@ namespace Red_7_GUI
         public void RemovePlayer(int player)
         {
             lobby.RemovePlayer(player);
+        }
+        public void ReturnToLobby()
+        {
+            lobby.Show();
         }
     }
 }

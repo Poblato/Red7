@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net;
 using System.Net.Sockets;
+using System.IO;
 
 namespace Red_7_GUI
 {
@@ -21,10 +22,11 @@ namespace Red_7_GUI
         private int cardWidth = 60;
         private int top = 300;
         private int players;
+        private string[] playerNames;
         private int player;
         private int shift;
 
-        public GameScreen(int players, int player, bool advanced, bool actionRule, int seed, bool start, TcpClient tcpClient)
+        public GameScreen(int players, int player, string[] playerNames, bool advanced, bool actionRule, int seed, bool start, ref TcpClient tcpClient, ref StreamWriter STW, ref StreamReader STR)
         {
             InitializeComponent();
             this.Text = "Game: " + players.ToString() + " players";
@@ -32,6 +34,7 @@ namespace Red_7_GUI
             palettes = new List<List<Button>>();
             playerHand = new List<Button>();
             this.players = players;
+            this.playerNames = playerNames;
             this.player = player;
             shift = (4 - player) % 4;
             for (int i = 0; i < players; i++)
@@ -55,6 +58,8 @@ namespace Red_7_GUI
             {
                 RedrawPalette(i);
             }
+
+            //MessageBox.Show("finished setup");
         }
         private void UpdateLabels()
         {
@@ -69,6 +74,10 @@ namespace Red_7_GUI
                     opponent3HandButton.Text = "Hand: " + client.Hands[3].Size.ToString();
                 }
             }
+            playerName.Text = playerNames[player];
+            opponent1Name.Text = playerNames[(player + 1) % 4];
+            opponent2Name.Text = playerNames[(player + 2) % 4];
+            opponent3Name.Text = playerNames[(player + 3) % 4];
             UpdateActionLabel();
         }
         private void UpdateActionLabel()
@@ -106,6 +115,7 @@ namespace Red_7_GUI
             }
             playerHand.Clear();
 
+            //MessageBox.Show(client.Hands.Count.ToString());
             for (int i = 0; i < client.Hands[player].Size; i++)
             {
                 Card card = client.Hands[player].GetCard(i);
@@ -334,6 +344,12 @@ namespace Red_7_GUI
         private void helpButton_Click(object sender, EventArgs e)
         {
             MessageBox.Show("open rules/gui overview screen");
+        }
+
+        private void quitButton_Click(object sender, EventArgs e)
+        {
+            Program.ReturnToLobby();
+            Close();
         }
     }
 }
