@@ -37,5 +37,9 @@ namespace Red_7_GUI
         {
             menu.Display(msg);
         }
+        public static void Left()
+        {
+            menu.Show();
+        }
     }
 }

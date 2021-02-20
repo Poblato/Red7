@@ -30,7 +30,7 @@ namespace Red_7_GUI
             List<Card> cards = new List<Card>();
             Card c;
 
-            for (int i = 0; i < hand.Count; i++)
+            for (int i = 0; i < base.cards.Count; i++)
             {
                 c = GetCard(i);
                 if (c.Rank % 2 == 0)
@@ -45,7 +45,7 @@ namespace Red_7_GUI
             List<Card> cards = new List<Card>();
             Card c;
 
-            for (int i = 0; i < hand.Count; i++)
+            for (int i = 0; i < base.cards.Count; i++)
             {
                 c = GetCard(i);
                 if (c.Rank == num)
@@ -60,7 +60,7 @@ namespace Red_7_GUI
             List<Card> cards = new List<Card>();
             Card c;
 
-            for (int i = 0; i < hand.Count; i++)
+            for (int i = 0; i < base.cards.Count; i++)
             {
                 c = GetCard(i);
                 if (c.Colour == col)
@@ -75,7 +75,7 @@ namespace Red_7_GUI
             List<Card> cards = new List<Card>();
             Card c;
 
-            for (int i = 0; i < hand.Count; i++)
+            for (int i = 0; i < base.cards.Count; i++)
             {
                 c = GetCard(i);
                 if (c.Rank < 4)
@@ -89,7 +89,6 @@ namespace Red_7_GUI
         {
             List<Card> longestRun = new List<Card>();
             List<Card> currentRun = new List<Card>();
-            List<Card> cards = new List<Card>();
 
             for (int i = 1; i < 8; i++)
             {
@@ -100,13 +99,17 @@ namespace Red_7_GUI
                 }
                 else
                 {
-                    if (currentRun.Count > longestRun.Count || (currentRun.Count == longestRun.Count && currentRun[currentRun.Count - 1].GetScore() > longestRun[longestRun.Count - 1].GetScore()))
+                    if (longestRun.Count == 0)
+                    {
+                        longestRun = currentRun;
+                        currentRun.Clear();
+                    }
+                    else if (currentRun.Count > longestRun.Count || (currentRun.Count == longestRun.Count && currentRun[currentRun.Count - 1].GetScore() > longestRun[longestRun.Count - 1].GetScore()))
                     {
                         longestRun = currentRun;
                         currentRun.Clear();
                     }
                 }
-                cards.Clear();
             }
 
             return longestRun;

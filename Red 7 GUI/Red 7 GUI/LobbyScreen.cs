@@ -65,16 +65,22 @@ namespace Red_7_GUI
         {
             if (set < 0)
             {
-                game.RedrawHand();
+                game.Invoke((MethodInvoker)delegate {
+                    game.RedrawHand();
+                });
             }
             else
             {
-                game.RedrawPalette(set);
+                game.Invoke((MethodInvoker)delegate {
+                    game.RedrawPalette(set);
+                });
             }
         }
         public void RemovePlayer(int player)
         {
-            game.RemovePlayer(player);
+            game.Invoke((MethodInvoker)delegate {
+                game.RemovePlayer(player);
+            });
         }
         #region Lobby
         private void UpdateLabels()
@@ -126,6 +132,8 @@ namespace Red_7_GUI
                 //MessageBox.Show("sending leave message");
                 ClientSend("1");
             }
+
+            Program.Left();
             Close();
         }
         private void startButton_Click(object sender, EventArgs e)
@@ -325,7 +333,7 @@ namespace Red_7_GUI
         private Thread[] receivers;
         private Thread listener;
         private int numClients;
-        private int currentPlayerIndex;
+        private int currentPlayer;
         private List<int> alivePlayers;
         private void StartServer()
         {
@@ -475,6 +483,40 @@ namespace Red_7_GUI
                     }
                     break;
                 case '3'://end turn
+                    //end turn; player; winning; your turn; actions
+
+                    msg = "3" + clientNum.ToString() + data[1] + "0" + data.Substring(2);//all other players
+                    msg2 = "3" + clientNum.ToString() + data[1] + "1" + data.Substring(2);//next player
+
+                    if (data[1] == '0')//player not winning
+                    {
+                        alivePlayers.Remove(clientNum);
+                    }
+                    if (alivePlayers.Count == 1)
+                    {
+                        //player wins
+                    }
+                    
+                    for (int i = 0; i < alivePlayers.Count; i++)//increments the player turn
+                    {
+                        if (currentPlayer == alivePlayers[i])
+                        {
+                            currentPlayer = alivePlayers[(i + 1) % numClients];
+                            break;
+                        }
+                    }
+
+                    foreach (int i in alivePlayers)
+                    {
+                        if (i == currentPlayer)
+                        {
+                            writers[i].WriteLine(msg2);
+                        }
+                        else if (i != clientNum)
+                        {
+                            writers[i].WriteLine(msg);
+                        }
+                    }
                     break;
                 case '4'://
                     break;
@@ -549,12 +591,14 @@ namespace Red_7_GUI
                 throw new Exception("lowest card not found - no card lower than red 7");
             }
 
-            currentPlayerIndex = startingPlayer;
+            currentPlayer = startingPlayer;
         }
         private void StartGame(int seed)
         {
             gameStarted = true;
             alivePlayers = new List<int>();
+
+            //MessageBox.Show(numClients.ToString());
 
             for (int i = 0; i < numClients; i++)
             {
@@ -563,13 +607,13 @@ namespace Red_7_GUI
 
             for (int i = 0; i < numClients; i++)
             {
-                if (i == currentPlayerIndex)
+                if (i == currentPlayer)
                 {
-                    writers[i].WriteLine("41" + seed);
+                    writers[i].WriteLine("41" + seed);//starting player
                 }
                 else
                 {
-                    writers[i].WriteLine("40" + seed);
+                    writers[i].WriteLine("40" + seed);//all other player
                 }
             }
         }

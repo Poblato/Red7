@@ -252,7 +252,7 @@ namespace Red_7_GUI
         }
         private void Undo(Action action)
         {
-            Console.WriteLine(actions.Count);
+            //Console.WriteLine(actions.Count);
 
             MoveCard(action.EndPos, action.StartPos);
             gameState = action.PrevGameState;
@@ -264,6 +264,21 @@ namespace Red_7_GUI
 
             Program.Update(action.StartPos[1]);//updates start player
             Program.Update(action.EndPos[1]);//updates end player
+            Program.Update(-1);
+        }
+        private void DoActions(Queue<Action> actions)
+        {
+            Action action;
+            while (actions.Count > 0)
+            {
+                action = actions.Dequeue();
+                MoveCard(action.StartPos, action.EndPos);
+            }
+
+            for (int i = 0; i < players; i++)
+            {
+                Program.Update(i);
+            }
             Program.Update(-1);
         }
         private void MoveCard(int[] startPos, int[] endPos)
@@ -335,6 +350,20 @@ namespace Red_7_GUI
                 actionQueue.Enqueue(actions.Pop());
             }
 
+            string msg = "3";
+
+            if (winning)
+            {
+                msg += "1";
+            }
+            else
+            {
+                msg += "0";
+            }
+
+            msg += ActionEncode(actionQueue);
+
+            Send(msg);
             //send server winning, actionQueue
         }
         private void UpdateClient(Queue<Action> actionQueue, List<int> alivePlayers ,bool playerTurn) //triggers when queue of actions received from the server
@@ -406,6 +435,37 @@ namespace Red_7_GUI
                     Program.Display("Rule change request during game");
                     break;
                 case '3'://end turn
+                    int prevPlayer = int.Parse(data[1].ToString());
+                    bool won;
+                    if (data[2] == '0')
+                    {
+                        won = false;
+                    }
+                    else
+                    {
+                        won = true;
+                    }
+
+                    if (!won)
+                    {
+                        alivePlayers.Remove(prevPlayer);
+                        Program.RemovePlayer(prevPlayer);
+                    }
+
+                    Queue<Action> actions = ActionDecode(data.Substring(4));
+
+                    DoActions(actions);
+
+                    if (won != CheckWinner(prevPlayer))
+                    {
+                        Program.Display("Desync detected");
+                    }
+
+                    if (data[3] == '1')
+                    {
+                        gameState = 0;
+                    }
+                    Program.Update(-1);
                     break;
                 case '4'://start game
                     Program.Display("Start game request during game");
@@ -416,6 +476,123 @@ namespace Red_7_GUI
                     Program.Display("Invalid transmission type at client");
                     break;
             }
+        }
+        private string ActionEncode(Queue<Action> actions)
+        {
+            /* Format:
+             * end(0,1),type,prevGameState,[int,int,int],[int,int,int];nextAction
+             */
+            string encoded = "";
+            Action action;
+
+            for (int i = 0; i < actions.Count; i++)
+            {
+                action = actions.Dequeue();
+
+                if (action.End)
+                {
+                    encoded += '1';
+                }
+                else
+                {
+                    encoded += '0';
+                }
+                encoded += ',';
+
+                encoded += action.Type;
+                encoded += ',';
+
+                encoded += action.PrevGameState.ToString();
+                encoded += ',';
+
+                encoded += action.StartPos[0].ToString() + "|"+ action.StartPos[1].ToString()  + "|"+ action.StartPos[2].ToString();
+                encoded += ',';
+
+                encoded += action.EndPos[0].ToString() + "|" + action.EndPos[1].ToString() + "|" + action.EndPos[2].ToString();
+                encoded += ';';
+            }
+            return encoded;
+        }
+        private Queue<Action> ActionDecode(string encoded)
+        {
+            Queue<Action> actions = new Queue<Action>();
+            Action action;
+
+            string[] temp = encoded.Split(';');
+            string[][] actionStrings = new string[temp.Length - 1][];//split will add an empty string at the end as every ation ends in a ;
+            
+            for (int i = 0; i < temp.Length - 1; i++)
+            {
+                actionStrings[i] = temp[i].Split(',');
+            }
+
+            bool end;
+            int prevGameState = -1;
+            string type;
+            int[] startPos = new int[3];
+            int[] endPos = new int[3];
+            string[] posArray;
+
+            foreach (string[] a in actionStrings)
+            {
+                //Program.Display(a[0]);
+                if (a[0] == "0")
+                {
+                    end = false;
+                }
+                else
+                {
+                    end = true;
+                }
+
+                //Program.Display(a[1]);
+                type = a[1];
+
+                try
+                {
+                    //Program.Display(a[2]);
+                    prevGameState = int.Parse(a[2]);
+                }
+                catch
+                {
+                    Program.Display("non-integer gamestate in action decode");
+                }
+
+                //Program.Display(a[3]);
+                posArray = a[3].Split('|');
+                try
+                {
+                    startPos[0] = int.Parse(posArray[0]);
+                    startPos[1] = int.Parse(posArray[1]);
+                    startPos[2] = int.Parse(posArray[2]);
+                }
+                catch
+                {
+                    Program.Display("non-integer startpos in action decode");
+                }
+
+                //Program.Display(a[4]);
+                posArray = a[4].Split('|');
+                try
+                {
+                    endPos[0] = int.Parse(posArray[0]);
+                    endPos[1] = int.Parse(posArray[1]);
+                    endPos[2] = int.Parse(posArray[2]);
+                }
+                catch
+                {
+                    Program.Display("non-integer endpos in action decode");
+                }
+
+                action = new Action(type, prevGameState);
+                action.End = end;
+                action.StartPos = startPos;
+                action.EndPos = endPos;
+
+                actions.Enqueue(action);
+            }
+
+            return actions;
         }
         private void PlayerLeft(int player)
         {
