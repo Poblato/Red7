@@ -102,7 +102,7 @@ namespace Red_7_GUI
 
             endPos[0] = 1;
             endPos[1] = player;
-            endPos[2] = palettes[player].Size - 1;
+            endPos[2] = palettes[player].Size;
 
             Action action = new Action("playToPalette", gameState);
             action.StartPos = new int[] { 0, player, startIndex };
@@ -112,42 +112,45 @@ namespace Red_7_GUI
 
             gameState = 1;
 
-            switch (card.Rank)
+            if (actionRule)
             {
-                case 1:
-                    //discard a card from other players' palette (that player must have more or same cards in palette than current player)
-                    gameState = 3;
+                switch (card.Rank)
+                {
+                    case 1:
+                        //discard a card from other players' palette (that player must have more or same cards in palette than current player)
+                        gameState = 3;
 
-                    bool largestPalette = true;//if the player's palette is largest, they are unable to discard from another player
-                    for (int i = 1; i < players; i++)
-                    {
-                        if (palettes[i].Size >= palettes[0].Size)
+                        bool largestPalette = true;//if the player's palette is largest, they are unable to discard from another player
+                        for (int i = 1; i < players; i++)
                         {
-                            largestPalette = false;
+                            if (palettes[i].Size >= palettes[0].Size)
+                            {
+                                largestPalette = false;
+                            }
                         }
-                    }
-                    if (largestPalette == true)
-                    {
-                        gameState = 1;
-                    }
-                    break;
-                case 3:
-                    action = new Action("drawCard", gameState);
-                    action.StartPos = new int[] { 0, -2, deck.Size };
-                    action.EndPos = new int[] { 0, player, hands[player].Size - 1 };
-                    action.End = false;
-                    actions.Push(action);
+                        if (largestPalette == true)
+                        {
+                            gameState = 1;
+                        }
+                        break;
+                    case 3:
+                        action = new Action("drawCard", gameState);
+                        action.StartPos = new int[] { 0, -2, deck.Size - 1 };
+                        action.EndPos = new int[] { 0, player, hands[player].Size };
+                        action.End = false;
+                        actions.Push(action);
 
-                    card = deck.DrawCard();
-                    hands[player].AddCard(card);//draw a card
-                    break;
-                case 5:
-                    gameState = 0;//allows the player to play another card 
-                    break;
-                case 7:
-                    //discard a card from player's palette
-                    gameState = 4;
-                    break;
+                        card = deck.DrawCard();
+                        hands[player].AddCard(card);//draw a card
+                        break;
+                    case 5:
+                        gameState = 0;//allows the player to play another card 
+                        break;
+                    case 7:
+                        //discard a card from player's palette
+                        gameState = 4;
+                        break;
+                }
             }
         }
         public void DiscardToCanvas(int player, int index)
@@ -172,8 +175,8 @@ namespace Red_7_GUI
                 {
 
                     action = new Action("drawCard", gameState);
-                    action.StartPos = new int[] { 0, -2, deck.Size };
-                    action.EndPos = new int[] { 0, player, hands[player].Size - 1 };
+                    action.StartPos = new int[] { 0, -2, deck.Size - 1 };
+                    action.EndPos = new int[] { 0, player, hands[player].Size };
                     action.End = false;
                     actions.Push(action);
 
@@ -239,14 +242,14 @@ namespace Red_7_GUI
         }
         public bool TryUndo()
         {
-            Action action = actions.Pop();
+            Action action = actions.Peek();
             if (action.Type == "drawCard")
             {
                 return false;
             }
             else
             {
-                Undo(action);
+                Undo(actions.Pop());
                 return true;
             }
         }
@@ -272,6 +275,9 @@ namespace Red_7_GUI
             while (actions.Count > 0)
             {
                 action = actions.Dequeue();
+                Program.Display(action.Type);
+                Program.Display(action.StartPos[0].ToString() + " " + action.StartPos[1].ToString() + " " + action.StartPos[2].ToString());
+                Program.Display(action.EndPos[0].ToString() + " " + action.EndPos[1].ToString() + " " + action.EndPos[2].ToString());
                 MoveCard(action.StartPos, action.EndPos);
             }
 
@@ -288,17 +294,21 @@ namespace Red_7_GUI
             {
                 case -1://canvas
                     card = canvas.Pop();
+                    Program.Display("Moving from canvas");
                     break;
                 case -2://deck
                     card = deck.DrawCard();
+                    Program.Display("Moving from deck");
                     break;
                 default://player
                     if (startPos[0] == 0)
                     {
+                        Program.Display("Moving from hand " + startPos[1].ToString());
                         card = hands[startPos[1]].RemoveCardByIndex(startPos[2]);
                     }
                     else
                     {
+                        Program.Display("Moving from palette " + startPos[1].ToString());
                         card = palettes[startPos[1]].RemoveCardByIndex(startPos[2]);
                     }
                     break;
@@ -307,18 +317,22 @@ namespace Red_7_GUI
             switch (endPos[1])
             {
                 case -1://canvas
+                    Program.Display("to canvas");
                     canvas.Push(card);
                     break;
                 case -2://deck
+                    Program.Display("to deck");
                     deck.AddCard(card);
                     break;
                 default://player
                     if (endPos[0] == 0)
                     {
+                        Program.Display("to hand " + endPos[1].ToString());
                         hands[endPos[1]].InsertCard(endPos[2], card);
                     }
                     else
                     {
+                        Program.Display("to palette " + endPos[1].ToString());
                         palettes[endPos[1]].InsertCard(endPos[2], card);
                     }
                     break;
@@ -326,6 +340,9 @@ namespace Red_7_GUI
         }
         public void EndTurn(bool winning)
         {
+
+            Program.Display(actions.Count.ToString());
+
             if (!winning && !canEnd)
             {
                 while (actions.Count != 0)
@@ -345,7 +362,7 @@ namespace Red_7_GUI
             Queue<Action> actionQueue = new Queue<Action>();
             actions.Reverse();
 
-            for (int i = 0; i < actions.Count; i++)//empties the action stack and puts it into a queue
+            while (actions.Count > 0)//empties the action stack and puts it into a queue
             {
                 actionQueue.Enqueue(actions.Pop());
             }
@@ -485,7 +502,7 @@ namespace Red_7_GUI
             string encoded = "";
             Action action;
 
-            for (int i = 0; i < actions.Count; i++)
+            while (actions.Count > 0)
             {
                 action = actions.Dequeue();
 
@@ -533,8 +550,9 @@ namespace Red_7_GUI
             int[] endPos = new int[3];
             string[] posArray;
 
-            foreach (string[] a in actionStrings)
+            for (int i = 0; i > actionStrings.Length; i++)
             {
+                string[] a = actionStrings[i];
                 //Program.Display(a[0]);
                 if (a[0] == "0")
                 {
@@ -548,9 +566,9 @@ namespace Red_7_GUI
                 //Program.Display(a[1]);
                 type = a[1];
 
+                //Program.Display(a[2]);
                 try
                 {
-                    //Program.Display(a[2]);
                     prevGameState = int.Parse(a[2]);
                 }
                 catch
@@ -558,7 +576,7 @@ namespace Red_7_GUI
                     Program.Display("non-integer gamestate in action decode");
                 }
 
-                //Program.Display(a[3]);
+                Program.Display(a[3]);
                 posArray = a[3].Split('|');
                 try
                 {
@@ -571,7 +589,9 @@ namespace Red_7_GUI
                     Program.Display("non-integer startpos in action decode");
                 }
 
-                //Program.Display(a[4]);
+                //Program.Display(startPos[0].ToString() + " " + startPos[1].ToString() + " " + startPos[2].ToString());
+
+                Program.Display(a[4]);
                 posArray = a[4].Split('|');
                 try
                 {
@@ -590,7 +610,19 @@ namespace Red_7_GUI
                 action.EndPos = endPos;
 
                 actions.Enqueue(action);
+
+                Queue<Action> debug1 = new Queue<Action>();
+                Action debug2;
+                while (actions.Count > 0)
+                {
+                    debug2 = actions.Dequeue();
+                    Program.Display(debug2.Type);
+                    debug1.Enqueue(debug2);
+                }
+                actions = debug1;
             }
+
+            //Program.Display(actions.Count.ToString());
 
             return actions;
         }

@@ -579,7 +579,7 @@ namespace Red_7_GUI
 
             for (int i = 0; i < numClients; i++)
             {
-                if (deck.GetCard(i).GetScore() < lowestCard.GetScore())
+                if (deck.DrawCard().GetScore() < lowestCard.GetScore())
                 {
                     lowestCard = deck.GetCard(i);
                     startingPlayer = i;

@@ -89,13 +89,14 @@ namespace Red_7_GUI
         {
             List<Card> longestRun = new List<Card>();
             List<Card> currentRun = new List<Card>();
+            List<Card> temp;
 
             for (int i = 1; i < 8; i++)
             {
-                cards = FindCardsByNumber(i);
-                if (cards.Count > 0)
+                temp = FindCardsByNumber(i);
+                if (temp.Count > 0)
                 {
-                    currentRun.Add(FindHighestCard(cards));
+                    currentRun.Add(FindHighestCard(temp));
                 }
                 else
                 {
