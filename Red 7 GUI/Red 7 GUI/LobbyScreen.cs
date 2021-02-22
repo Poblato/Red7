@@ -26,6 +26,7 @@ namespace Red_7_GUI
         public string send = "";
         private bool gameStarted;
         private GameScreen game;
+        bool serverStarted;
         public LobbyScreen(bool host, IPAddress ip, string username)
         {
             this.host = host;
@@ -34,6 +35,7 @@ namespace Red_7_GUI
             gameStarted = false;
             InitializeComponent();
             startButton.Enabled = false;
+            serverStarted = true;
 
             if (!host)
             {
@@ -115,22 +117,21 @@ namespace Red_7_GUI
         }
         private void quitButton_Click(object sender, EventArgs e)
         {
-            if (host)
+            //MessageBox.Show("sending leave message");
+            if (client.Connected)
             {
-                numClients = 0;
-                foreach (Thread th in receivers)
-                {
-                    if (th != null)
-                    {
-                        th.Abort();
-                    }
-                }
-                listener.Abort();
-            }
-            else
-            {
-                //MessageBox.Show("sending leave message");
                 ClientSend("1");
+
+                serverStarted = false;
+
+                client.Close();
+                client = new TcpClient();
+                try
+                {
+                    client.Connect(new IPEndPoint(ip, port));//allows the listener to close
+                    client.Close();
+                }
+                catch { }
             }
 
             Program.Left();
@@ -204,21 +205,30 @@ namespace Red_7_GUI
         }
         private void receiver_DoWork(object sender, DoWorkEventArgs e)
         {
-            while (client.Connected)
+            bool cont = true;
+            while (cont)
             {
                 try
                 {
-                    receive = STR.ReadLine();
-                    MessageBox.Show("Received " + receive);
-                    ClientDecode(receive);
+                    if (client.Connected)
+                    {
+                        receive = STR.ReadLine();
+                        MessageBox.Show("Received " + receive);
+                        cont = ClientDecode(receive);
+                    }
+                    else
+                    {
+                        cont = false;
+                    }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.ToString());
+                    //MessageBox.Show(ex.ToString());
+                    cont = false;
                 }
             }
         }
-        private void ClientDecode(string data)//triggers when a player joins the lobby
+        private bool ClientDecode(string data)//triggers when a player joins the lobby
         {
             switch (data[0])
             {
@@ -233,18 +243,18 @@ namespace Red_7_GUI
                         }
                     }
                     UpdateLabels();
-                    break;
+                    return true; ;
                 case '1'://leave
                     //MessageBox.Show("client received leave message");
                     try
                     {
-                        CPlayerLeft(int.Parse(data[1].ToString()));
+                        return CPlayerLeft(int.Parse(data[1].ToString()));
                     }
                     catch (Exception e)
                     {
                         MessageBox.Show(e.ToString());
                     }
-                    break;
+                    return true;
                 case '2'://rule update
                     if (data[1] == '0')//advanced
                     {
@@ -263,9 +273,9 @@ namespace Red_7_GUI
                         actionRule = true;
                     }
                     UpdateRules();
-                    break;
+                    return true;
                 case '3'://end turn
-                    break;
+                    return true; ;
                 case '4'://start game
                     bool start;
                     int seed = -1;
@@ -293,18 +303,22 @@ namespace Red_7_GUI
                         game.Show();
                     });
 
-                    break;
+                    return true;
                 case '5'://
-                    break;
+                    return true;
                 default:
                     MessageBox.Show("Invalid transmission type at client");
-                    break;
+                    return true;
             }
         }
-        private void CPlayerLeft(int player)
+        private bool CPlayerLeft(int player)
         {
             MessageBox.Show(player.ToString());
             //MessageBox.Show(numPlayers.ToString());
+            if (player == FindPlayerNum())
+            {
+                return false;
+            }
             clientPlayers[player] = "";
             for (int i = player; i < numPlayers - 1; i++)
             {
@@ -312,6 +326,7 @@ namespace Red_7_GUI
             }
             numPlayers--;
             UpdateLabels();
+            return true;
         }
         private int FindPlayerNum()//returns the index of the player, -1 if not found
         {
@@ -364,7 +379,7 @@ namespace Red_7_GUI
             listener.Start();
             //MessageBox.Show("listening for new connections");
 
-            while (numClients < 4 && !gameStarted)
+            while (numClients < 4 && !gameStarted && serverStarted)
             {
                 //MessageBox.Show("next conn");
                 clients[numClients] = listener.AcceptTcpClient();
@@ -383,9 +398,8 @@ namespace Red_7_GUI
                 numClients++;
             }
             listener.Stop();
-            listener = null;
         }
-        private void ServerDecode(string data, int clientNum)//triggers when a player joins the lobby
+        private bool ServerDecode(string data, int clientNum)//triggers when a player joins the lobby - returns whether or not to close the receiver
         {
             string msg;
             string msg2;
@@ -438,7 +452,8 @@ namespace Red_7_GUI
                             writers[i].WriteLine(msg2);//sends data to client i
                         }
                     }
-                    break;
+
+                    return true;
                 case '1'://leave
                     //MessageBox.Show("server received leave message");
                     SPlayerLeft(clientNum);
@@ -452,7 +467,8 @@ namespace Red_7_GUI
                             writers[i].WriteLine(msg);//sends data to client i
                         }
                     }
-                    break;
+
+                    return false;//closes the connection
                 case '2'://rule update
                     msg = "2";
 
@@ -481,7 +497,8 @@ namespace Red_7_GUI
                             writers[i].WriteLine(msg);//sends data to client i
                         }
                     }
-                    break;
+
+                    return true;
                 case '3'://end turn
                     //end turn; player; winning; your turn; actions
 
@@ -517,18 +534,23 @@ namespace Red_7_GUI
                             writers[i].WriteLine(msg);
                         }
                     }
-                    break;
+
+                    return true;
                 case '4'://
-                    break;
+                    return true;
+                case '-'://ack
+
+                    return true;
                 default:
                     MessageBox.Show("Invalid transmission type at server");
-                    break;
+                    return true;
             }
 
         }
         private void ServerReceive(Object obj)
         {
             int client;
+            bool cont = true;
             try
             {
                 client = (int)obj;
@@ -538,7 +560,7 @@ namespace Red_7_GUI
                 MessageBox.Show("Non-integer parsed to server receiver");
                 return;
             }
-            while (true)
+            while (cont && serverStarted)
             {
                 if (clients[client].Connected)
                 {
@@ -550,7 +572,7 @@ namespace Red_7_GUI
                         if (!char.IsWhiteSpace(receive[0]))
                         {
                             MessageBox.Show(receive + " from " + client.ToString());
-                            ServerDecode(receive, client);
+                            cont = ServerDecode(receive, client);
                         }
                     }
                     catch (Exception ex)

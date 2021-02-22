@@ -328,12 +328,12 @@ namespace Red_7_GUI
                     if (endPos[0] == 0)
                     {
                         Program.Display("to hand " + endPos[1].ToString());
-                        hands[endPos[1]].InsertCard(endPos[2], card);
+                        hands[endPos[1]].AddCard(card);
                     }
                     else
                     {
                         Program.Display("to palette " + endPos[1].ToString());
-                        palettes[endPos[1]].InsertCard(endPos[2], card);
+                        palettes[endPos[1]].AddCard(card);
                     }
                     break;
             }
@@ -360,7 +360,6 @@ namespace Red_7_GUI
         public void UpdateServer(bool winning)
         {
             Queue<Action> actionQueue = new Queue<Action>();
-            actions.Reverse();
 
             while (actions.Count > 0)//empties the action stack and puts it into a queue
             {
@@ -469,6 +468,7 @@ namespace Red_7_GUI
                         Program.RemovePlayer(prevPlayer);
                     }
 
+                    //Program.Display(data.Substring(4));
                     Queue<Action> actions = ActionDecode(data.Substring(4));
 
                     DoActions(actions);
@@ -546,13 +546,16 @@ namespace Red_7_GUI
             bool end;
             int prevGameState = -1;
             string type;
-            int[] startPos = new int[3];
-            int[] endPos = new int[3];
-            string[] posArray;
 
-            for (int i = 0; i > actionStrings.Length; i++)
+            //Program.Display(actionStrings.Length.ToString());
+
+            for (int i = actionStrings.Length - 1; i > -1; i--)
             {
                 string[] a = actionStrings[i];
+                string[] posArray;
+                int[] startPos = new int[3];
+                int[] endPos = new int[3];
+
                 //Program.Display(a[0]);
                 if (a[0] == "0")
                 {
@@ -576,7 +579,7 @@ namespace Red_7_GUI
                     Program.Display("non-integer gamestate in action decode");
                 }
 
-                Program.Display(a[3]);
+                //Program.Display(a[3]);
                 posArray = a[3].Split('|');
                 try
                 {
@@ -591,7 +594,7 @@ namespace Red_7_GUI
 
                 //Program.Display(startPos[0].ToString() + " " + startPos[1].ToString() + " " + startPos[2].ToString());
 
-                Program.Display(a[4]);
+                //Program.Display(a[4]);
                 posArray = a[4].Split('|');
                 try
                 {
@@ -610,18 +613,8 @@ namespace Red_7_GUI
                 action.EndPos = endPos;
 
                 actions.Enqueue(action);
-
-                Queue<Action> debug1 = new Queue<Action>();
-                Action debug2;
-                while (actions.Count > 0)
-                {
-                    debug2 = actions.Dequeue();
-                    Program.Display(debug2.Type);
-                    debug1.Enqueue(debug2);
-                }
-                actions = debug1;
             }
-
+            //actions.Reverse();
             //Program.Display(actions.Count.ToString());
 
             return actions;
