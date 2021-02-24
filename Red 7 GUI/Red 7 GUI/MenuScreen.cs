@@ -76,13 +76,13 @@ namespace Red_7_GUI
         {
             lobby.Update(set);
         }
-        public void RemovePlayer(int player)
+        public void RemovePlayer(int player, bool left)
         {
-            lobby.RemovePlayer(player);
+            lobby.RemovePlayer(player, left);
         }
-        public void ReturnToLobby()
+        public void LeaveGame()
         {
-            lobby.Show();
+            lobby.LeaveLobby();
         }
         public void Display(string msg)
         {

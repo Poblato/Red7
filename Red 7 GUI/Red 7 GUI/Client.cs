@@ -31,11 +31,7 @@ namespace Red_7_GUI
                                 * 3: select card to discard from other player palette (triggers when 1 played and action rule is enabled)
                                 * 4: select card to discard from own palette (triggers when 7 played and action rule is enabled)
                                 */
-
-        TcpClient client;
         StreamWriter STW;
-        StreamReader STR;
-        Thread receiver;
         public int GameState { get { return gameState; } set { gameState = value; } }
         public List<Hand> Hands { get { return hands; } }
         public List<Palette> Palettes { get { return palettes; } }
@@ -438,7 +434,7 @@ namespace Red_7_GUI
                     Program.Display("Rule change request during game");
                     break;
                 case '3'://end turn
-                    Program.Display("switched");
+                    //Program.Display("switched");
                     int prevPlayer = int.Parse(data[1].ToString());
                     bool won;
                     if (data[2] == '0')
@@ -453,13 +449,13 @@ namespace Red_7_GUI
                     if (!won)
                     {
                         alivePlayers.Remove(prevPlayer);
-                        Program.RemovePlayer(prevPlayer);
+                        Program.RemovePlayer(prevPlayer, false);
                     }
 
                     //Program.Display(data.Substring(4));
                     Queue<Action> actions = ActionDecode(data.Substring(4));
 
-                    Program.Display("decoded");
+                    //Program.Display("decoded");
 
                     DoActions(actions);
 
@@ -483,7 +479,7 @@ namespace Red_7_GUI
                     {
                         winner = int.Parse(data[1].ToString());
                     }
-                    catch(Exception e)
+                    catch(Exception)
                     {
                         Program.Display("non-integer player win");
                     }
@@ -623,12 +619,12 @@ namespace Red_7_GUI
         {
             //MessageBox.Show(numPlayers.ToString());
             alivePlayers.Remove(player);
-            Program.RemovePlayer(player);
+            Program.RemovePlayer(player, true);
         }
         public void Debug()
         {
             alivePlayers.Remove(1);
-            Program.RemovePlayer(1);
+            Program.RemovePlayer(1, false);
         }
     }
 }

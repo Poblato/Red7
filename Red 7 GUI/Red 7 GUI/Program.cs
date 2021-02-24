@@ -25,13 +25,13 @@ namespace Red_7_GUI
         {
             menu.Update(set);
         }
-        public static void RemovePlayer(int player)
+        public static void RemovePlayer(int player, bool left)
         {
-            menu.RemovePlayer(player);
+            menu.RemovePlayer(player, left);
         }
-        public static void ReturnToLobby()
+        public static void LeaveGame()
         {
-            menu.ReturnToLobby();
+            menu.LeaveGame();
         }
         public static void Display(string msg)
         {

@@ -351,7 +351,7 @@ namespace Red_7_GUI
 
         private void quitButton_Click(object sender, EventArgs e)
         {
-            Program.ReturnToLobby();
+            Program.LeaveGame();
             Close();
         }
         public void Display(string msg)

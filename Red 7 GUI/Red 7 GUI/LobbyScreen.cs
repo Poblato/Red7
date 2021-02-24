@@ -78,11 +78,24 @@ namespace Red_7_GUI
                 });
             }
         }
-        public void RemovePlayer(int player)
+        public void RemovePlayer(int player, bool left)
         {
             game.Invoke((MethodInvoker)delegate {
                 game.RemovePlayer(player);
             });
+            if (player == FindPlayerNum())
+            {
+                Close();
+            }
+
+            if (left)
+            {
+                MessageBox.Show(clientPlayers[player] + " has left the game");
+            }
+            else
+            {
+                MessageBox.Show(clientPlayers[player] + " has lost");
+            }
         }
         #region Lobby
         private void UpdateLabels()
@@ -118,6 +131,10 @@ namespace Red_7_GUI
         private void quitButton_Click(object sender, EventArgs e)
         {
             //MessageBox.Show("sending leave message");
+            LeaveLobby();
+        }
+        public void LeaveLobby()
+        {
             if (client.Connected)
             {
                 ClientSend("1");
@@ -521,9 +538,14 @@ namespace Red_7_GUI
                     if (alivePlayers.Count == 1)
                     {
                         int winner = alivePlayers[0];
-                        foreach (StreamWriter w in writers)
+
+                        for (int i = 0; i < numClients; i++)
                         {
-                            w.WriteLine("5" + winner.ToString());
+                            if (clients[i].Connected)
+                            {
+                                //MessageBox.Show("sending " + msg + " to " + i.ToString());
+                                writers[i].WriteLine("5" + winner.ToString()); ;//sends data to client i
+                            }
                         }
                         return true;
                         //player wins
@@ -542,12 +564,12 @@ namespace Red_7_GUI
                     {
                         if (i == currentPlayer)
                         {
-                            MessageBox.Show("sent: " + msg2 + " to " + i.ToString());
+                            //MessageBox.Show("sent: " + msg2 + " to " + i.ToString());
                             writers[i].WriteLine(msg2);
                         }
                         else if (i != clientNum)
                         {
-                            MessageBox.Show("sent: " + msg + " to " + i.ToString());
+                            //MessageBox.Show("sent: " + msg + " to " + i.ToString());
                             writers[i].WriteLine(msg);
                         }
                     }
@@ -588,7 +610,7 @@ namespace Red_7_GUI
                         receive = readers[client].ReadLine();
                         if (!char.IsWhiteSpace(receive[0]))
                         {
-                            MessageBox.Show(receive + " from " + client.ToString());
+                            //MessageBox.Show(receive + " from " + client.ToString());
                             cont = ServerDecode(receive, client);
                         }
                     }
@@ -667,12 +689,17 @@ namespace Red_7_GUI
             {
                 MessageBox.Show("display called before game started");
             }
-        } 
+        }
         public void EndGame(int winner)
         {
-            gameStarted = false;
             MessageBox.Show(clientPlayers[winner] + " wins!");
-            game.Close();
+            game.Invoke((MethodInvoker)delegate {
+                game.Close();
+            });
+            this.Invoke((MethodInvoker)delegate {
+                this.Show();
+            });
+            gameStarted = false;
         }
     }
 }
