@@ -88,5 +88,9 @@ namespace Red_7_GUI
         {
             lobby.Display(msg);
         }
+        public void EndGame(int winner)
+        {
+            lobby.EndGame(winner);
+        }
     }
 }

@@ -47,9 +47,9 @@ namespace Red_7_GUI
         {
             cards.Insert(index, card);
         }
-        public void RemoveCard(Card c)
+        public void RemoveCard(Card card)
         {
-            RemoveCardByIndex(FindCard(c));
+            RemoveCardByIndex(FindCard(card));
         }
         public Card RemoveCardByIndex(int index)
         {

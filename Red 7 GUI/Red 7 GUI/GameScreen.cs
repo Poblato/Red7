@@ -26,11 +26,11 @@ namespace Red_7_GUI
         private int player;
         private int shift;
 
-        public GameScreen(int players, int player, string[] playerNames, bool advanced, bool actionRule, int seed, bool start, ref TcpClient tcpClient, ref StreamWriter STW, ref StreamReader STR)
+        public GameScreen(int players, int player, string[] playerNames, bool advanced, bool actionRule, int seed, bool start, ref StreamWriter STW)
         {
             InitializeComponent();
             this.Text = "Game: " + players.ToString() + " players";
-            client = new Client(players, advanced, actionRule, seed, ref tcpClient, ref STW, ref STR);
+            client = new Client(players, advanced, actionRule, seed, ref STW);
             palettes = new List<List<Button>>();
             playerHand = new List<Button>();
             this.players = players;
@@ -357,6 +357,10 @@ namespace Red_7_GUI
         public void Display(string msg)
         {
             MessageBox.Show(msg);
+        }
+        public void GameDecode(string msg)
+        {
+            client.Decode(msg);
         }
     }
 }

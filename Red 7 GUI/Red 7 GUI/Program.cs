@@ -41,5 +41,9 @@ namespace Red_7_GUI
         {
             menu.Show();
         }
+        public static void EndGame(int winner)
+        {
+            menu.EndGame(winner);
+        }
     }
 }

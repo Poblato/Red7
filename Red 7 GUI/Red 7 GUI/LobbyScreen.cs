@@ -213,8 +213,15 @@ namespace Red_7_GUI
                     if (client.Connected)
                     {
                         receive = STR.ReadLine();
-                        MessageBox.Show("Received " + receive);
-                        cont = ClientDecode(receive);
+                        //MessageBox.Show("Received " + receive);
+                        if (gameStarted)
+                        {
+                            game.GameDecode(receive);
+                        }
+                        else
+                        {
+                            cont = ClientDecode(receive);
+                        }
                     }
                     else
                     {
@@ -243,7 +250,7 @@ namespace Red_7_GUI
                         }
                     }
                     UpdateLabels();
-                    return true; ;
+                    return true;
                 case '1'://leave
                     //MessageBox.Show("client received leave message");
                     try
@@ -295,13 +302,15 @@ namespace Red_7_GUI
                     {
                         MessageBox.Show("Invalid seed: " + e.ToString());
                     }
-                    receiver.CancelAsync();
+                    //receiver.CancelAsync();
 
                     this.Invoke((MethodInvoker)delegate {
-                        game = new GameScreen(numPlayers, FindPlayerNum(), clientPlayers, advanced, actionRule, seed, start, ref client, ref STW, ref STR);
+                        game = new GameScreen(numPlayers, FindPlayerNum(), clientPlayers, advanced, actionRule, seed, start, ref STW);
                         this.Hide();
                         game.Show();
                     });
+
+                    gameStarted = true;
 
                     return true;
                 case '5'://
@@ -511,6 +520,12 @@ namespace Red_7_GUI
                     }
                     if (alivePlayers.Count == 1)
                     {
+                        int winner = alivePlayers[0];
+                        foreach (StreamWriter w in writers)
+                        {
+                            w.WriteLine("5" + winner.ToString());
+                        }
+                        return true;
                         //player wins
                     }
                     
@@ -518,7 +533,7 @@ namespace Red_7_GUI
                     {
                         if (currentPlayer == alivePlayers[i])
                         {
-                            currentPlayer = alivePlayers[(i + 1) % numClients];
+                            currentPlayer = alivePlayers[(i + 1) % alivePlayers.Count];
                             break;
                         }
                     }
@@ -527,10 +542,12 @@ namespace Red_7_GUI
                     {
                         if (i == currentPlayer)
                         {
+                            MessageBox.Show("sent: " + msg2 + " to " + i.ToString());
                             writers[i].WriteLine(msg2);
                         }
                         else if (i != clientNum)
                         {
+                            MessageBox.Show("sent: " + msg + " to " + i.ToString());
                             writers[i].WriteLine(msg);
                         }
                     }
@@ -617,7 +634,6 @@ namespace Red_7_GUI
         }
         private void StartGame(int seed)
         {
-            gameStarted = true;
             alivePlayers = new List<int>();
 
             //MessageBox.Show(numClients.ToString());
@@ -643,7 +659,20 @@ namespace Red_7_GUI
 
         public void Display(string msg)
         {
-            game.Display(msg);
+            try
+            {
+                game.Display(msg);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("display called before game started");
+            }
         } 
+        public void EndGame(int winner)
+        {
+            gameStarted = false;
+            MessageBox.Show(clientPlayers[winner] + " wins!");
+            game.Close();
+        }
     }
 }

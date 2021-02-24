@@ -42,7 +42,7 @@ namespace Red_7_GUI
         public Deck Deck { get { return deck; } }
         public Card Canvas { get { return canvas.Peek(); } }
         public bool CanUndo { get { if (actions.Count == 0) return false; else return true; } }
-        public Client(int numPlayers, bool advanced, bool actionRule, int seed, ref TcpClient tcpClient, ref StreamWriter STW, ref StreamReader STR)
+        public Client(int numPlayers, bool advanced, bool actionRule, int seed, ref StreamWriter STW)
         {
             palettes = new List<Palette>();
             hands = new List<Hand>();
@@ -50,11 +50,9 @@ namespace Red_7_GUI
             scorer = new Scorer();
             canvas = new Stack<Card>();
             actions = new Stack<Action>();
-            client = tcpClient;
-            this.STW = STW;
-            this.STR = STR;
             alivePlayers = new List<int>();
             players = numPlayers;
+            this.STW = STW;
             canEnd = true;
             deck.Reset(seed);
             this.advanced = advanced;
@@ -69,8 +67,8 @@ namespace Red_7_GUI
                 hands.Add(new Hand());
             }
 
-            receiver = new Thread(Receive);
-            receiver.Start();
+            //receiver = new Thread(Receive);
+            //receiver.Start();
 
             Setup();
         }
@@ -276,8 +274,8 @@ namespace Red_7_GUI
             {
                 action = actions.Dequeue();
                 Program.Display(action.Type);
-                Program.Display(action.StartPos[0].ToString() + " " + action.StartPos[1].ToString() + " " + action.StartPos[2].ToString());
-                Program.Display(action.EndPos[0].ToString() + " " + action.EndPos[1].ToString() + " " + action.EndPos[2].ToString());
+                //Program.Display(action.StartPos[0].ToString() + " " + action.StartPos[1].ToString() + " " + action.StartPos[2].ToString());
+                //Program.Display(action.EndPos[0].ToString() + " " + action.EndPos[1].ToString() + " " + action.EndPos[2].ToString());
                 MoveCard(action.StartPos, action.EndPos);
             }
 
@@ -380,6 +378,8 @@ namespace Red_7_GUI
             msg += ActionEncode(actionQueue);
 
             Send(msg);
+
+            //Program.Display("sent");
             //send server winning, actionQueue
         }
         private void UpdateClient(Queue<Action> actionQueue, List<int> alivePlayers ,bool playerTurn) //triggers when queue of actions received from the server
@@ -404,32 +404,19 @@ namespace Red_7_GUI
                 Program.Update(i);
             }
         }
-        private void Receive()
-        {
-            string receive;
-            while (client.Connected)
-            {
-                try
-                {
-                    receive = STR.ReadLine();
-                    Program.Display("Received " + receive);
-                    Decode(receive);
-                }
-                catch (Exception e)
-                {
-                    Program.Display(e.ToString());
-                }
-            }
-        }
         private void Send(string data)
         {
-            if (client.Connected)
+            try
             {
                 STW.WriteLine(data);
-                //MessageBox.Show("Sent " + data);
+                Program.Display("Sent " + data);
+            }
+            catch (Exception e)
+            {
+                Program.Display(e.ToString());
             }
         }
-        private void Decode(string data)
+        public void Decode(string data)
         {
             switch (data[0])
             {
@@ -451,6 +438,7 @@ namespace Red_7_GUI
                     Program.Display("Rule change request during game");
                     break;
                 case '3'://end turn
+                    Program.Display("switched");
                     int prevPlayer = int.Parse(data[1].ToString());
                     bool won;
                     if (data[2] == '0')
@@ -471,6 +459,8 @@ namespace Red_7_GUI
                     //Program.Display(data.Substring(4));
                     Queue<Action> actions = ActionDecode(data.Substring(4));
 
+                    Program.Display("decoded");
+
                     DoActions(actions);
 
                     if (won != CheckWinner(prevPlayer))
@@ -487,7 +477,17 @@ namespace Red_7_GUI
                 case '4'://start game
                     Program.Display("Start game request during game");
                     break;
-                case '5'://
+                case '5'://game over
+                    int winner = -1;
+                    try
+                    {
+                        winner = int.Parse(data[1].ToString());
+                    }
+                    catch(Exception e)
+                    {
+                        Program.Display("non-integer player win");
+                    }
+                    Program.EndGame(winner);
                     break;
                 default:
                     Program.Display("Invalid transmission type at client");
