@@ -91,7 +91,7 @@ namespace Red_7_GUI
             List<Card> currentRun = new List<Card>();
             List<Card> temp;
 
-            for (int i = 1; i < 8; i++)
+            for (int i = 1; i < 9; i++)
             {
                 temp = FindCardsByNumber(i);
                 if (temp.Count > 0)

@@ -346,7 +346,8 @@ namespace Red_7_GUI
 
         private void helpButton_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("open rules/gui overview screen");
+            GameHelp helpScreen = new GameHelp();
+            helpScreen.Show();
         }
 
         private void quitButton_Click(object sender, EventArgs e)

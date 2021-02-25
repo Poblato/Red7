@@ -126,7 +126,8 @@ namespace Red_7_GUI
         }
         private void helpButton_Click(object sender, EventArgs e)//opens lobby help window
         {
-            ClientSend("test");
+            LobbyHelp helpScreen = new LobbyHelp();
+            helpScreen.Show();
             //open lobby help window
         }
         private void quitButton_Click(object sender, EventArgs e)//leaves the lobby
