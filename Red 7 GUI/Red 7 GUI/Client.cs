@@ -96,7 +96,7 @@ namespace Red_7_GUI
 
             endPos[0] = 1;
             endPos[1] = player;
-            endPos[2] = palettes[player].Size;
+            endPos[2] = palettes[player].Size - 1;
 
             Action action = new Action("playToPalette", gameState);
             action.StartPos = new int[] { 0, player, startIndex };
@@ -322,12 +322,28 @@ namespace Red_7_GUI
                     if (endPos[0] == 0)
                     {
                         Program.Display("to hand " + endPos[1].ToString());
-                        hands[endPos[1]].AddCard(card);
+
+                        if (endPos[2] == hands[endPos[1]].Size)
+                        {
+                            hands[endPos[1]].AddCard(card);
+                        }
+                        else
+                        {
+                            hands[endPos[1]].InsertCard(endPos[2], card);
+                        }
                     }
                     else
                     {
                         Program.Display("to palette " + endPos[1].ToString());
-                        palettes[endPos[1]].AddCard(card);
+
+                        if (endPos[2] == palettes[endPos[1]].Size)
+                        {
+                            palettes[endPos[1]].AddCard(card);
+                        }
+                        else
+                        {
+                            palettes[endPos[1]].InsertCard(endPos[2], card);
+                        }
                     }
                     break;
             }
