@@ -14,7 +14,7 @@ namespace Red_7_GUI
 		}
 		public bool Score(List<Palette> palettes, int currentPlayer, int colour, List<int> alivePlayers)
 		{
-			switch (colour)
+			switch (colour)//chooses the correct algorithm to use
 			{
 				case 1:
 					return MostCardsBelowFour(palettes, currentPlayer, alivePlayers);
@@ -34,7 +34,7 @@ namespace Red_7_GUI
 					throw new Exception("Invalid colour on canvas");
 			}
 		}
-		private Card FindHighestCard(List<Card> cards)
+		private Card FindHighestCard(List<Card> cards)//finds the highest card from a list
 		{
 			Card highest = new Card(0, 0);
 			foreach (Card c in cards)

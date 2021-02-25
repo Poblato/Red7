@@ -22,9 +22,9 @@ namespace Red_7_GUI
         {
             Close();
         }
-        private void hostGameButton_Click(object sender, EventArgs e)
+        private void hostGameButton_Click(object sender, EventArgs e)//attempts to host a new lobby
         {
-            if (usernameTextBox.Text == string.Empty)
+            if (usernameTextBox.Text == string.Empty)//checks that the user has entered a valid name
             {
                 MessageBox.Show("Please enter a username");
             }
@@ -42,19 +42,19 @@ namespace Red_7_GUI
                 lobby.Show();
             }
         }
-        private void joinGameButton_Click(object sender, EventArgs e)
+        private void joinGameButton_Click(object sender, EventArgs e)//attempts to join a lobby
         {
-            if (usernameTextBox.Text == string.Empty)
+            if (usernameTextBox.Text == string.Empty)//checks that the user has entered a valid name
             {
                 MessageBox.Show("Please enter a username");
             }
-            else if (usernameTextBox.Text.Contains("~"))
+            else if (usernameTextBox.Text.Contains("~"))//'~' is used as the separator in communications so cannot be part of a username
             {
                 MessageBox.Show("Names cannot contain ~");
             }
             else
             {
-                var ipPopup = new IPPopup();
+                var ipPopup = new IPPopup();//opens a popup for the user to enter the ip address
                 ipPopup.ShowDialog(this);
                 IPAddress ip = ipPopup.ip;
                 ipPopup.Dispose();
@@ -62,7 +62,7 @@ namespace Red_7_GUI
                 if (ip != default)
                 {
                     Hide();
-                    lobby = new LobbyScreen(false, ip, usernameTextBox.Text);
+                    lobby = new LobbyScreen(false, ip, usernameTextBox.Text);//opens the lobby and attempts to connect
                     try
                     {
                         lobby.Show();
@@ -72,6 +72,8 @@ namespace Red_7_GUI
             }
         }
 
+
+        //pass-through functions from the static calls in Program
         public void Update(int set)
         {
             lobby.Update(set);

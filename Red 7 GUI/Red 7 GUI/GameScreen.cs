@@ -28,9 +28,8 @@ namespace Red_7_GUI
 
         public GameScreen(int players, int player, string[] playerNames, bool advanced, bool actionRule, int seed, bool start, ref StreamWriter STW)
         {
-            InitializeComponent();
             this.Text = "Game: " + players.ToString() + " players";
-            client = new Client(players, advanced, actionRule, seed, ref STW);
+            client = new Client(players, advanced, actionRule, seed, ref STW);//initialises variables
             palettes = new List<List<Button>>();
             playerHand = new List<Button>();
             this.players = players;
@@ -41,46 +40,47 @@ namespace Red_7_GUI
             {
                 palettes.Add(new List<Button>());
             }
+            InitializeComponent();
 
             Setup(start);
 
             //client.Debug();
         }
-        private void Setup(bool start)
+        private void Setup(bool start)//sets up the game
         {            
             if (!start)
             {
-                client.GameState = -1;
+                client.GameState = -1;//if the player is not starting, set gamestate to waiting
             }
 
-            RedrawHand();
+            RedrawHand();//reset hand
             for (int i = 0; i < players; i++)
             {
-                RedrawPalette(i);
+                RedrawPalette(i);//reset palettes
             }
 
             //MessageBox.Show("finished setup");
         }
-        private void UpdateLabels()
+        private void UpdateLabels()//updates the labels
         {
             canvas.Text = client.Canvas.GetName();
             deckCardsLabel.Text = "Cards Left: " + client.Deck.Size.ToString();
-            opponent1HandButton.Text = "Hand: " + client.Hands[1].Size.ToString();
+            opponent1HandButton.Text = "Hand: " + client.Hands[(player + 1) % 4].Size.ToString();//updates hand labels
             if (players > 2)
             {
-                opponent2HandButton.Text = "Hand: " + client.Hands[2].Size.ToString();
+                opponent2HandButton.Text = "Hand: " + client.Hands[(player + 2) % 4].Size.ToString();
                 if (player > 3)
                 {
-                    opponent3HandButton.Text = "Hand: " + client.Hands[3].Size.ToString();
+                    opponent3HandButton.Text = "Hand: " + client.Hands[(player + 3) % 4].Size.ToString();
                 }
             }
-            playerName.Text = playerNames[player];
+            playerName.Text = playerNames[player];//updates player name labels
             opponent1Name.Text = playerNames[(player + 1) % 4];
             opponent2Name.Text = playerNames[(player + 2) % 4];
             opponent3Name.Text = playerNames[(player + 3) % 4];
             UpdateActionLabel();
         }
-        private void UpdateActionLabel()
+        private void UpdateActionLabel()//updates label that shows the gamestate
         {
             switch (client.GameState)
             {
@@ -109,7 +109,7 @@ namespace Red_7_GUI
         public void RedrawHand()
         {
             //MessageBox.Show("Redrawing hand");
-            foreach (Button b in playerHand)
+            foreach (Button b in playerHand)//removes old hand
             {
                 b.Dispose();
             }
@@ -118,7 +118,7 @@ namespace Red_7_GUI
             //MessageBox.Show(client.Hands.Count.ToString());
             for (int i = 0; i < client.Hands[player].Size; i++)
             {
-                Card card = client.Hands[player].GetCard(i);
+                Card card = client.Hands[player].GetCard(i);//finds corresponding card
                 playerHand.Add(new Button()
                 {
                     Size = new Size(cardWidth, cardHeight),
@@ -139,7 +139,7 @@ namespace Red_7_GUI
         {
             //MessageBox.Show("Redrawing palette " + player.ToString());
             Card card;
-            foreach (Button b in palettes[player])
+            foreach (Button b in palettes[player])//removes old palette
             {
                 b.Dispose();
             }
@@ -149,7 +149,7 @@ namespace Red_7_GUI
             {
                 for (int i = 0; i < client.Palettes[player].Size; i++)
                 {
-                    card = client.Palettes[player].GetCard(i);
+                    card = client.Palettes[player].GetCard(i);//finds corresponding card
                     palettes[player].Add(new Button()
                     {
                         Size = new Size(cardWidth, cardHeight),
@@ -167,7 +167,7 @@ namespace Red_7_GUI
             }
             else
             {
-                int visualIndex = (player + shift) % 4;
+                int visualIndex = (player + shift) % 4;//visually shift players so that the player appears at the top
                 for (int i = 0; i < client.Palettes[player].Size; i++)
                 {
                     card = client.Palettes[player].GetCard(i);
@@ -223,13 +223,13 @@ namespace Red_7_GUI
                 }
                 else
                 {
-                    if (e.Button == MouseButtons.Left)
+                    if (e.Button == MouseButtons.Left)//discards to canvas
                     {
                         client.DiscardPaletteCard(player, index, -1);
                         RedrawPalette(player);
                         UpdateLabels();
                     }
-                    else if (e.Button == MouseButtons.Right)
+                    else if (e.Button == MouseButtons.Right)//discards to deck
                     {
                         client.DiscardPaletteCard(player, index, -2);
                         RedrawPalette(player);
@@ -245,13 +245,13 @@ namespace Red_7_GUI
                 }
                 else
                 {
-                    if (e.Button == MouseButtons.Left)
+                    if (e.Button == MouseButtons.Left)//discards to canvas
                     {
                         client.DiscardPaletteCard(player, index, -1);
                         RedrawPalette(player);
                         UpdateLabels();
                     }
-                    else if (e.Button == MouseButtons.Right)
+                    else if (e.Button == MouseButtons.Right)//discards to deck
                     {
                         client.DiscardPaletteCard(player, index, -2);
                         RedrawPalette(player);
@@ -303,7 +303,7 @@ namespace Red_7_GUI
         }
         private void undoButton_Click(object sender, EventArgs e)
         {
-            if (client.CanUndo)
+            if (client.CanUndo)//stops undo if there are no actions to undo
             {
                 bool success = client.TryUndo();
 
@@ -319,12 +319,12 @@ namespace Red_7_GUI
         }
         private void endTurnButton_Click(object sender, EventArgs e)
         {
-            if (client.CheckWinner(this.player))
+            if (client.CheckWinner(this.player))//ends the turn if player is winning
             {
                 client.EndTurn(true);
             }
             else
-            {
+            {//warns player if not winning
                 var result = MessageBox.Show("You are not winning - are you sure you want to end your turn", "Confirm end turn", MessageBoxButtons.YesNo);
 
                 if (result == DialogResult.Yes)
@@ -333,7 +333,7 @@ namespace Red_7_GUI
                 }
             }
         }
-        public void RemovePlayer(int player)
+        public void RemovePlayer(int player)//disables a player's hand so that they cannot be interacted with (i.e. with action rule)
         {
             foreach (Button b in palettes[player])
             {
@@ -354,11 +354,11 @@ namespace Red_7_GUI
             Program.LeaveGame();
             Close();
         }
-        public void Display(string msg)
+        public void Display(string msg)//debug
         {
             MessageBox.Show(msg);
         }
-        public void GameDecode(string msg)
+        public void GameDecode(string msg)//pass through function from client receiver in lobby
         {
             client.Decode(msg);
         }

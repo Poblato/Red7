@@ -29,34 +29,35 @@ namespace Red_7_GUI
         bool serverStarted;
         public LobbyScreen(bool host, IPAddress ip, string username)
         {
-            this.host = host;
+            this.host = host;//initialises variables
             this.username = username;
             clientPlayers = new string[4];
             gameStarted = false;
+            serverStarted = true;
             InitializeComponent();
             startButton.Enabled = false;
-            serverStarted = true;
 
             if (!host)
             {
                 this.ip = ip;
-                startServerButton.Enabled = false;
+                startServerButton.Enabled = false;//disables host options
                 actionCheckBox.Enabled = false;
                 advancedCheckBox.Enabled = false;
                 
 
-                if (!ConnectToServer())
+                if (!ConnectToServer())//attempts to connect to server, closes if falied
                 {
                     Close();
+                    Program.Left();
                 }
 
-                ClientSend("0" + username);
+                ClientSend("0" + username);//sends join message with username
 
                 receiver.RunWorkerAsync();//starts receiver
             }
             else
             {
-                IPHostEntry hostInfo = Dns.GetHostEntry("localhost");
+                IPHostEntry hostInfo = Dns.GetHostEntry("localhost");//sets ip to local machine
                 this.ip = hostInfo.AddressList[hostInfo.AddressList.Length - 1];
                 player0Label.Text = username + " (host)";
             }
@@ -65,30 +66,30 @@ namespace Red_7_GUI
         }
         public void Update(int set)
         {
-            if (set < 0)
+            if (set < 0)//redraws the player hand
             {
                 game.Invoke((MethodInvoker)delegate {
                     game.RedrawHand();
                 });
             }
-            else
+            else//redraws a palette
             {
                 game.Invoke((MethodInvoker)delegate {
                     game.RedrawPalette(set);
                 });
             }
         }
-        public void RemovePlayer(int player, bool left)
+        public void RemovePlayer(int player, bool left)//removes a player from the lobby/game
         {
-            game.Invoke((MethodInvoker)delegate {
+            game.Invoke((MethodInvoker)delegate {//removes the player from the game
                 game.RemovePlayer(player);
             });
-            if (player == FindPlayerNum())
+            if (player == FindPlayerNum())//if the player is leaving close the lobby
             {
                 Close();
             }
 
-            if (left)
+            if (left)//displays the appropriate message
             {
                 MessageBox.Show(clientPlayers[player] + " has left the game");
             }
@@ -98,7 +99,7 @@ namespace Red_7_GUI
             }
         }
         #region Lobby
-        private void UpdateLabels()
+        private void UpdateLabels()//updates the player names
         {
             //ensures that this is called from the main thread - winforms does not support multithreaded access to components
             this.player0Label.Invoke((MethodInvoker)delegate {
@@ -114,7 +115,7 @@ namespace Red_7_GUI
                 this.player3Label.Text = clientPlayers[3];
             });
         }
-        private void UpdateRules()
+        private void UpdateRules()//updates the rules
         {
             this.advancedCheckBox.Invoke((MethodInvoker)delegate {
                 this.advancedCheckBox.Checked = advanced;
@@ -123,12 +124,12 @@ namespace Red_7_GUI
                 this.actionCheckBox.Checked = actionRule;
             });
         }
-        private void helpButton_Click(object sender, EventArgs e)
+        private void helpButton_Click(object sender, EventArgs e)//opens lobby help window
         {
             ClientSend("test");
             //open lobby help window
         }
-        private void quitButton_Click(object sender, EventArgs e)
+        private void quitButton_Click(object sender, EventArgs e)//leaves the lobby
         {
             //MessageBox.Show("sending leave message");
             LeaveLobby();
@@ -137,7 +138,7 @@ namespace Red_7_GUI
         {
             if (client.Connected)
             {
-                ClientSend("1");
+                ClientSend("1");//ensures the receivers exit properly
 
                 serverStarted = false;
 
@@ -151,10 +152,10 @@ namespace Red_7_GUI
                 catch { }
             }
 
-            Program.Left();
+            Program.Left();//closes the lobby and re-opens the menu
             Close();
         }
-        private void startButton_Click(object sender, EventArgs e)
+        private void startButton_Click(object sender, EventArgs e)//starts the game
         {
             if (numPlayers > 1)
             {
@@ -169,12 +170,12 @@ namespace Red_7_GUI
                 MessageBox.Show("Looks like there's noone here to play with you (can't relate)", "Cannot start game");
             }
         }
-        private void actionCheckBox_CheckedChanged(object sender, EventArgs e)
+        private void actionCheckBox_CheckedChanged(object sender, EventArgs e)//updates the game rules
         {
             actionRule = actionCheckBox.Checked;
             ServerDecode("2", 0);//tells the server that rules have changed
         }
-        private void advancedCheckBox_CheckedChanged(object sender, EventArgs e)
+        private void advancedCheckBox_CheckedChanged(object sender, EventArgs e)//updates the game rules
         {
             advanced = advancedCheckBox.Checked;
             ServerDecode("2", 0);//tells the server that rules have changed
@@ -186,18 +187,18 @@ namespace Red_7_GUI
         private TcpClient client;
         private string[] clientPlayers;
         private int numPlayers = 0;
-        private bool ConnectToServer()
+        private bool ConnectToServer()//attempts to connect to the server
         {
             client = new TcpClient();
             IPEndPoint remoteEndpoint = new IPEndPoint(ip, port);
 
             try
             {
-                client.Connect(remoteEndpoint);
+                client.Connect(remoteEndpoint);//tries to connect
                 if (client.Connected)
                 {
                     //MessageBox.Show("Connected to server");
-                    STW = new StreamWriter(client.GetStream());
+                    STW = new StreamWriter(client.GetStream());//binds the client streamreader and streamwriter to the tcp stream
                     STR = new StreamReader(client.GetStream());
                     STW.AutoFlush = true;
 
@@ -212,7 +213,7 @@ namespace Red_7_GUI
 
             return false;
         }
-        private void ClientSend(string data)
+        private void ClientSend(string data)//sends data to the server
         {
             if (client.Connected)
             {
@@ -220,7 +221,7 @@ namespace Red_7_GUI
                 //MessageBox.Show("Sent " + data);
             }
         }
-        private void receiver_DoWork(object sender, DoWorkEventArgs e)
+        private void receiver_DoWork(object sender, DoWorkEventArgs e)//backgroundworker work function to receive messages from the server
         {
             bool cont = true;
             while (cont)
@@ -252,21 +253,21 @@ namespace Red_7_GUI
                 }
             }
         }
-        private bool ClientDecode(string data)//triggers when a player joins the lobby
+        private bool ClientDecode(string data)//triggers when a player joins the lobby - returns whether or not to continue the connection
         {
             switch (data[0])
             {
                 case '0'://join
-                    clientPlayers = data.Substring(1).Split('~');
+                    clientPlayers = data.Substring(1).Split('~');//updates the username array
                     numPlayers = 0;
-                    foreach (string s in clientPlayers)
+                    foreach (string s in clientPlayers)//updates the number of players
                     {
                         if (s != string.Empty)
                         {
                             numPlayers++;
                         }
                     }
-                    UpdateLabels();
+                    UpdateLabels();//updates the GUI
                     return true;
                 case '1'://leave
                     //MessageBox.Show("client received leave message");
@@ -288,7 +289,7 @@ namespace Red_7_GUI
                     {
                         advanced = true;
                     }
-                    if (data[2] == '0')
+                    if (data[2] == '0')//action rule
                     {
                         actionRule = false;
                     }
@@ -299,9 +300,9 @@ namespace Red_7_GUI
                     UpdateRules();
                     return true;
                 case '3'://end turn
-                    return true; ;
+                    return true;
                 case '4'://start game
-                    bool start;
+                    bool start;//whether the player is the starting player
                     int seed = -1;
                     if (data[1] == '0')
                     {
@@ -324,7 +325,7 @@ namespace Red_7_GUI
                     this.Invoke((MethodInvoker)delegate {
                         game = new GameScreen(numPlayers, FindPlayerNum(), clientPlayers, advanced, actionRule, seed, start, ref STW);
                         this.Hide();
-                        game.Show();
+                        game.Show();//starts the game
                     });
 
                     gameStarted = true;
@@ -337,21 +338,21 @@ namespace Red_7_GUI
                     return true;
             }
         }
-        private bool CPlayerLeft(int player)
+        private bool CPlayerLeft(int player)//removes a player on the client
         {
-            MessageBox.Show(player.ToString());
+            //MessageBox.Show(player.ToString());
             //MessageBox.Show(numPlayers.ToString());
-            if (player == FindPlayerNum())
+            if (player == FindPlayerNum())//disconnects the client (the player leaving is the local client)
             {
                 return false;
             }
-            clientPlayers[player] = "";
+            clientPlayers[player] = "";//removes player name
             for (int i = player; i < numPlayers - 1; i++)
             {
-                clientPlayers[i] = clientPlayers[i + 1];
+                clientPlayers[i] = clientPlayers[i + 1];//shuffles player names back one
             }
             numPlayers--;
-            UpdateLabels();
+            UpdateLabels();//updates GUI
             return true;
         }
         private int FindPlayerNum()//returns the index of the player, -1 if not found
@@ -385,39 +386,39 @@ namespace Red_7_GUI
             receivers = new Thread[4];
             listener = new Thread(ConnectionListen);
 
-            listener.Start();
+            listener.Start();//listens for new connections
 
             ConnectToServer();//connects host to the server
-            receiver.RunWorkerAsync();
+            receiver.RunWorkerAsync();//starts the client receiver
 
-            ClientSend("0" + username);
+            ClientSend("0" + username);//join message for host
         }
-        private void startServerButton_Click(object sender, EventArgs e)
+        private void startServerButton_Click(object sender, EventArgs e)//starts the server
         {
             numClients = 0;
             startButton.Enabled = true;
             startServerButton.Enabled = false;
             StartServer();
         }
-        private void ConnectionListen()
+        private void ConnectionListen()//listens for new connections
         {
             TcpListener listener = new TcpListener(IPAddress.Any, port);
             listener.Start();
             //MessageBox.Show("listening for new connections");
 
-            while (numClients < 4 && !gameStarted && serverStarted)
+            while (numClients < 4 && !gameStarted && serverStarted)//stops listening when the lobby is full or the the game starts/server closes
             {
                 //MessageBox.Show("next conn");
-                clients[numClients] = listener.AcceptTcpClient();
-                if (gameStarted)
+                clients[numClients] = listener.AcceptTcpClient();//the thread will hang on this line until a connection is received
+                if (gameStarted)//if game was started while the listener was hanging
                 {
-                    clients[numClients].Close();
+                    clients[numClients].Close();//close the new connection
                     break;
                 }
-                readers[numClients] = new StreamReader(clients[numClients].GetStream());
+                readers[numClients] = new StreamReader(clients[numClients].GetStream());//binds the streamreader and streamwriter
                 writers[numClients] = new StreamWriter(clients[numClients].GetStream());
                 writers[numClients].AutoFlush = true;
-                receivers[numClients] = new Thread(ServerReceive);
+                receivers[numClients] = new Thread(ServerReceive);//runs the receiver for the new client
 
                 receivers[numClients].Start(numClients);
                 //MessageBox.Show("Client " + numClients.ToString() + " connected");
@@ -425,7 +426,7 @@ namespace Red_7_GUI
             }
             listener.Stop();
         }
-        private bool ServerDecode(string data, int clientNum)//triggers when a player joins the lobby - returns whether or not to close the receiver
+        private bool ServerDecode(string data, int clientNum)//triggers when a client sends a message - returns whether or not to close the receiver
         {
             string msg;
             string msg2;
@@ -434,7 +435,7 @@ namespace Red_7_GUI
                 case '0'://join (username)
                     serverPlayers[clientNum] = data.Substring(1);
 
-                    msg = "0";
+                    msg = "0";//join
 
                     foreach(string name in serverPlayers)
                     {
@@ -451,7 +452,7 @@ namespace Red_7_GUI
                         }
                     }
 
-                    msg2 = "2";
+                    msg2 = "2";//update rules
 
                     if (advanced)
                     {
@@ -470,22 +471,16 @@ namespace Red_7_GUI
                         msg2 += "0";
                     }
 
-                    for (int i = 1; i < numClients; i++)//send to all except host
-                    {
-                        if (clients[i].Connected)
-                        {
-                            //MessageBox.Show("sending " + msg2 + " to " + i.ToString());
-                            writers[i].WriteLine(msg2);//sends data to client i
-                        }
-                    }
+                    writers[clientNum].WriteLine(msg2);//sends to new player
 
                     return true;
                 case '1'://leave
+
                     //MessageBox.Show("server received leave message");
                     SPlayerLeft(clientNum);
                     msg = "1" + clientNum.ToString();
 
-                    for (int i = 0; i < numClients; i++)
+                    for (int i = 0; i < numClients; i++)//sends to all cients
                     {
                         if (clients[i].Connected)
                         {
@@ -535,7 +530,7 @@ namespace Red_7_GUI
                     {
                         alivePlayers.Remove(clientNum);
                     }
-                    if (alivePlayers.Count == 1)
+                    if (alivePlayers.Count == 1)//if only one player left, game ends with them winning
                     {
                         int winner = alivePlayers[0];
 
@@ -586,13 +581,13 @@ namespace Red_7_GUI
             }
 
         }
-        private void ServerReceive(Object obj)
+        private void ServerReceive(Object obj)//receiver for server
         {
             int client;
             bool cont = true;
             try
             {
-                client = (int)obj;
+                client = (int)obj;//parses in the client to listen to
             }
             catch
             {
@@ -606,7 +601,6 @@ namespace Red_7_GUI
                     //MessageBox.Show("Client " + client.ToString() + " is connected");
                     try
                     {
-                        //MessageBox.Show("data detected");
                         receive = readers[client].ReadLine();
                         if (!char.IsWhiteSpace(receive[0]))
                         {
@@ -631,18 +625,18 @@ namespace Red_7_GUI
                 writers[i] = writers[i + 1];
             }
         }
-        private void FindFirstPlayer(int seed)
+        private void FindFirstPlayer(int seed)//finds the first player to take their turn
         {
             Deck deck = new Deck();
-            deck.Reset(seed);
+            deck.Reset(seed);//sets up a deck using the game seed
             Card lowestCard = new Card(7, 7);
             int startingPlayer = -1;
 
-            for (int i = 0; i < numClients; i++)
+            for (int i = 0; i < numClients; i++)//draws a card for each player (these will go onto the palette)
             {
                 if (deck.DrawCard().GetScore() < lowestCard.GetScore())
                 {
-                    lowestCard = deck.GetCard(i);
+                    lowestCard = deck.GetCard(i);//the player with the lowerst card goes first
                     startingPlayer = i;
                 }
             }
@@ -654,7 +648,7 @@ namespace Red_7_GUI
 
             currentPlayer = startingPlayer;
         }
-        private void StartGame(int seed)
+        private void StartGame(int seed)//starts a game with a given seed
         {
             alivePlayers = new List<int>();
 
@@ -662,10 +656,10 @@ namespace Red_7_GUI
 
             for (int i = 0; i < numClients; i++)
             {
-                alivePlayers.Add(i);
+                alivePlayers.Add(i);//sets up aliveplayers list
             }
 
-            for (int i = 0; i < numClients; i++)
+            for (int i = 0; i < numClients; i++)//sends start messages
             {
                 if (i == currentPlayer)
                 {
@@ -679,7 +673,7 @@ namespace Red_7_GUI
         }
         #endregion
 
-        public void Display(string msg)
+        public void Display(string msg)//displays a message
         {
             try
             {
@@ -690,7 +684,7 @@ namespace Red_7_GUI
                 MessageBox.Show("display called before game started");
             }
         }
-        public void EndGame(int winner)
+        public void EndGame(int winner)//displays win message and returns to lobby
         {
             MessageBox.Show(clientPlayers[winner] + " wins!");
             game.Invoke((MethodInvoker)delegate {

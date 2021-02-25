@@ -45,7 +45,7 @@ namespace Red_7_GUI
             deck = new Deck();
             scorer = new Scorer();
             canvas = new Stack<Card>();
-            actions = new Stack<Action>();
+            actions = new Stack<Action>();//initialises variables
             alivePlayers = new List<int>();
             players = numPlayers;
             this.STW = STW;
@@ -54,9 +54,9 @@ namespace Red_7_GUI
             this.advanced = advanced;
             this.actionRule = actionRule;
 
-            canvas.Push(new Card(0, 7));
+            canvas.Push(new Card(0, 7));//sets starting rule to red
 
-            for (int i = 0; i < numPlayers; i++)
+            for (int i = 0; i < numPlayers; i++)//initialises players
             {
                 alivePlayers.Add(i);
                 palettes.Add(new Palette());
@@ -86,14 +86,14 @@ namespace Red_7_GUI
                 }
             }
         }
-        public void PlayToPalette(int player, int startIndex)
+        public void PlayToPalette(int player, int startIndex)//plays a card from hand to palette
         {
-            Card card = hands[player].GetCard(startIndex);
-            palettes[player].AddCard(card);
-            hands[player].RemoveCardByIndex(startIndex);
+            Card card = hands[player].GetCard(startIndex);//finds the corresponding card
+            palettes[player].AddCard(card);//adds the card to the palette
+            hands[player].RemoveCardByIndex(startIndex);//removes the card from the hand
 
+            //adds an action detailing the move
             int[] endPos = new int[3];
-
             endPos[0] = 1;
             endPos[1] = player;
             endPos[2] = palettes[player].Size - 1;
@@ -104,7 +104,7 @@ namespace Red_7_GUI
 
             actions.Push(action);
 
-            gameState = 1;
+            gameState = 1;//changes the game state to discard only
 
             if (actionRule)
             {
@@ -128,7 +128,7 @@ namespace Red_7_GUI
                         }
                         break;
                     case 3:
-                        action = new Action("drawCard", gameState);
+                        action = new Action("drawCard", gameState);//adds draw card action to the stack
                         action.StartPos = new int[] { 0, -2, deck.Size - 1 };
                         action.EndPos = new int[] { 0, player, hands[player].Size };
                         action.End = false;
@@ -147,7 +147,7 @@ namespace Red_7_GUI
                 }
             }
         }
-        public void DiscardToCanvas(int player, int index)
+        public void DiscardToCanvas(int player, int index)//discards a card from hand to canvas
         {
             Card card = hands[player].GetCard(index);
             int[] startPos = new int[3];
@@ -160,7 +160,7 @@ namespace Red_7_GUI
 
             actions.Push(action);
 
-            gameState = 2;
+            gameState = 2;//sets gamestate to end turn only
             canEnd = false;
 
             if (advanced == true)
@@ -168,7 +168,7 @@ namespace Red_7_GUI
                 if (card.Rank > palettes[player].Size)
                 {
 
-                    action = new Action("drawCard", gameState);
+                    action = new Action("drawCard", gameState);//adds a draw card action to the stack
                     action.StartPos = new int[] { 0, -2, deck.Size - 1 };
                     action.EndPos = new int[] { 0, player, hands[player].Size };
                     action.End = false;
@@ -180,7 +180,7 @@ namespace Red_7_GUI
                 }
             }
         }
-        public void DiscardPaletteCard(int player, int index, int target)//target: -1 for canvas, -2 for deck
+        public void DiscardPaletteCard(int player, int index, int target)//discards a card from a player's palette, target: -1 for canvas, -2 for deck
         {
             Card card = hands[player].GetCard(index);
             int[] startPos = new int[3];
@@ -193,22 +193,23 @@ namespace Red_7_GUI
             action.End = false;
             actions.Push(action);
 
-            gameState = 1;
+            gameState = 1;//sets gamestate to discard only
             if (target != player)
             {
                 canEnd = false;
             }
         }
-        private Action DiscardCard(int[] startPos, int target)
+        private Action DiscardCard(int[] startPos, int target)//discards a card, return its associated action
         {
             Card card = new Card(0, 0);
             int targetPos = 0;
-            if (startPos[0] == 0)
+            //gets corresponding card
+            if (startPos[0] == 0)//from hand
             {
                 card = hands[startPos[1]].GetCard(startPos[2]);
                 hands[startPos[1]].RemoveCardByIndex(startPos[2]);
             }
-            else if (startPos[0] == 1)
+            else if (startPos[0] == 1)//from palette
             {
                 card = palettes[startPos[1]].GetCard(startPos[2]);
                 palettes[startPos[1]].RemoveCardByIndex(startPos[2]);
@@ -217,7 +218,7 @@ namespace Red_7_GUI
             action.StartPos = startPos;
 
 
-            switch (target)
+            switch (target)//moves the card to the correct target
             {
                 case -1://canvas
                     canvas.Push(card);
@@ -234,7 +235,7 @@ namespace Red_7_GUI
             action.EndPos = new int[] { 1, target, targetPos };
             return action;
         }
-        public bool TryUndo()
+        public bool TryUndo()//undo an action if not an illegal undo (draw card)
         {
             Action action = actions.Peek();
             if (action.Type == "drawCard")
@@ -247,11 +248,11 @@ namespace Red_7_GUI
                 return true;
             }
         }
-        private void Undo(Action action)
+        private void Undo(Action action)//undo any action
         {
             //Console.WriteLine(actions.Count);
 
-            MoveCard(action.EndPos, action.StartPos);
+            MoveCard(action.EndPos, action.StartPos);//reverses the card move
             gameState = action.PrevGameState;
 
             if (action.End == false)
@@ -263,7 +264,7 @@ namespace Red_7_GUI
             Program.Update(action.EndPos[1]);//updates end player
             Program.Update(-1);
         }
-        private void DoActions(Queue<Action> actions)
+        private void DoActions(Queue<Action> actions)//executes the queue of actions in sequence
         {
             Action action;
             while (actions.Count > 0)
@@ -281,7 +282,7 @@ namespace Red_7_GUI
             }
             Program.Update(-1);
         }
-        private void MoveCard(int[] startPos, int[] endPos)
+        private void MoveCard(int[] startPos, int[] endPos)//moves a card from one point to antother
         {
             Card card;
             switch (startPos[1])
@@ -295,14 +296,14 @@ namespace Red_7_GUI
                     Program.Display("Moving from deck");
                     break;
                 default://player
-                    if (startPos[0] == 0)
+                    if (startPos[0] == 0)//hand
                     {
-                        Program.Display("Moving from hand " + startPos[1].ToString());
+                        //Program.Display("Moving from hand " + startPos[1].ToString());
                         card = hands[startPos[1]].RemoveCardByIndex(startPos[2]);
                     }
-                    else
+                    else//palette
                     {
-                        Program.Display("Moving from palette " + startPos[1].ToString());
+                        //Program.Display("Moving from palette " + startPos[1].ToString());
                         card = palettes[startPos[1]].RemoveCardByIndex(startPos[2]);
                     }
                     break;
@@ -319,9 +320,9 @@ namespace Red_7_GUI
                     deck.AddCard(card);
                     break;
                 default://player
-                    if (endPos[0] == 0)
+                    if (endPos[0] == 0)//hnad
                     {
-                        Program.Display("to hand " + endPos[1].ToString());
+                        //Program.Display("to hand " + endPos[1].ToString());
 
                         if (endPos[2] == hands[endPos[1]].Size)
                         {
@@ -332,9 +333,9 @@ namespace Red_7_GUI
                             hands[endPos[1]].InsertCard(endPos[2], card);
                         }
                     }
-                    else
+                    else//palette
                     {
-                        Program.Display("to palette " + endPos[1].ToString());
+                        //Program.Display("to palette " + endPos[1].ToString());
 
                         if (endPos[2] == palettes[endPos[1]].Size)
                         {
@@ -348,26 +349,25 @@ namespace Red_7_GUI
                     break;
             }
         }
-        public void EndTurn(bool winning)
+        public void EndTurn(bool winning)//ends the turn
         {
 
             Program.Display(actions.Count.ToString());
 
-            if (!winning && !canEnd)
+            if (!winning && !canEnd)//if the player is not winning and they took actions that cannot be taken on a losing turn
             {
-                while (actions.Count != 0)
+                while (actions.Count != 0)//undo their actions
                 {
                     Undo(actions.Pop());
                 }
-                // remove players' cards from play
             }
 
             gameState = -1;
             canEnd = true;
             Program.Update(-1);
-            UpdateServer(winning);
+            UpdateServer(winning);//sends turn info to the server
         }
-        public void UpdateServer(bool winning)
+        public void UpdateServer(bool winning)//sends the end turn info to the server
         {
             Queue<Action> actionQueue = new Queue<Action>();
 
@@ -376,7 +376,7 @@ namespace Red_7_GUI
                 actionQueue.Enqueue(actions.Pop());
             }
 
-            string msg = "3";
+            string msg = "3";//end turn
 
             if (winning)
             {
@@ -387,36 +387,14 @@ namespace Red_7_GUI
                 msg += "0";
             }
 
-            msg += ActionEncode(actionQueue);
+            msg += ActionEncode(actionQueue);//encodes the actions into a string
 
             Send(msg);
 
             //Program.Display("sent");
             //send server winning, actionQueue
         }
-        private void UpdateClient(Queue<Action> actionQueue, List<int> alivePlayers ,bool playerTurn) //triggers when queue of actions received from the server
-        {
-            Action action;
-            this.alivePlayers = alivePlayers;
-
-            for (int i = 0; i < actionQueue.Count; i++)
-            {
-                action = actionQueue.Dequeue();
-
-                MoveCard(action.StartPos, action.EndPos);
-            }
-
-            if (playerTurn)
-            {
-                gameState = 0;
-            }
-
-            foreach (int i in alivePlayers)//updates the form
-            {
-                Program.Update(i);
-            }
-        }
-        private void Send(string data)
+        private void Send(string data)//sends data to the server
         {
             try
             {
@@ -428,7 +406,7 @@ namespace Red_7_GUI
                 Program.Display(e.ToString());
             }
         }
-        public void Decode(string data)
+        public void Decode(string data)//decodes data received from the server
         {
             switch (data[0])
             {
@@ -464,7 +442,7 @@ namespace Red_7_GUI
 
                     if (!won)
                     {
-                        alivePlayers.Remove(prevPlayer);
+                        alivePlayers.Remove(prevPlayer);//removes a losing player from the game
                         Program.RemovePlayer(prevPlayer, false);
                     }
 
@@ -475,12 +453,12 @@ namespace Red_7_GUI
 
                     DoActions(actions);
 
-                    if (won != CheckWinner(prevPlayer))
+                    if (won != CheckWinner(prevPlayer))//if the calculated winning result is different from the player's result, there is a difference in game states from one client to another
                     {
                         Program.Display("Desync detected");
                     }
 
-                    if (data[3] == '1')
+                    if (data[3] == '1')//next player
                     {
                         gameState = 0;
                     }
@@ -493,7 +471,7 @@ namespace Red_7_GUI
                     int winner = -1;
                     try
                     {
-                        winner = int.Parse(data[1].ToString());
+                        winner = int.Parse(data[1].ToString());//finds winner
                     }
                     catch(Exception)
                     {
@@ -506,7 +484,7 @@ namespace Red_7_GUI
                     break;
             }
         }
-        private string ActionEncode(Queue<Action> actions)
+        private string ActionEncode(Queue<Action> actions)//encodes actions into a string
         {
             /* Format:
              * end(0,1),type,prevGameState,[int,int,int],[int,int,int];nextAction
@@ -550,7 +528,7 @@ namespace Red_7_GUI
             string[] temp = encoded.Split(';');
             string[][] actionStrings = new string[temp.Length - 1][];//split will add an empty string at the end as every ation ends in a ;
             
-            for (int i = 0; i < temp.Length - 1; i++)
+            for (int i = 0; i < temp.Length - 1; i++)//splits each action into its attributes
             {
                 actionStrings[i] = temp[i].Split(',');
             }
@@ -561,7 +539,7 @@ namespace Red_7_GUI
 
             //Program.Display(actionStrings.Length.ToString());
 
-            for (int i = actionStrings.Length - 1; i > -1; i--)
+            for (int i = actionStrings.Length - 1; i > -1; i--)//iterates through backwards to preserve the order
             {
                 string[] a = actionStrings[i];
                 string[] posArray;
@@ -631,7 +609,7 @@ namespace Red_7_GUI
 
             return actions;
         }
-        private void PlayerLeft(int player)
+        private void PlayerLeft(int player)//removes a player from the game
         {
             //MessageBox.Show(numPlayers.ToString());
             alivePlayers.Remove(player);

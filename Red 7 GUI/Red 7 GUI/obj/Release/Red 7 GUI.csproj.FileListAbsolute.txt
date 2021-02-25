@@ -1,0 +1,13 @@
+C:\Users\Blaise\source\repos\Red7\Red 7 GUI\Red 7 GUI\bin\Release\Red 7 GUI.exe.config
+C:\Users\Blaise\source\repos\Red7\Red 7 GUI\Red 7 GUI\bin\Release\Red 7 GUI.exe
+C:\Users\Blaise\source\repos\Red7\Red 7 GUI\Red 7 GUI\bin\Release\Red 7 GUI.pdb
+C:\Users\Blaise\source\repos\Red7\Red 7 GUI\Red 7 GUI\obj\Release\Red 7 GUI.csprojAssemblyReference.cache
+C:\Users\Blaise\source\repos\Red7\Red 7 GUI\Red 7 GUI\obj\Release\Red_7_GUI.GameScreen.resources
+C:\Users\Blaise\source\repos\Red7\Red 7 GUI\Red 7 GUI\obj\Release\Red_7_GUI.IPPopup.resources
+C:\Users\Blaise\source\repos\Red7\Red 7 GUI\Red 7 GUI\obj\Release\Red_7_GUI.LobbyScreen.resources
+C:\Users\Blaise\source\repos\Red7\Red 7 GUI\Red 7 GUI\obj\Release\Red_7_GUI.MenuScreen.resources
+C:\Users\Blaise\source\repos\Red7\Red 7 GUI\Red 7 GUI\obj\Release\Red_7_GUI.Properties.Resources.resources
+C:\Users\Blaise\source\repos\Red7\Red 7 GUI\Red 7 GUI\obj\Release\Red 7 GUI.csproj.GenerateResource.cache
+C:\Users\Blaise\source\repos\Red7\Red 7 GUI\Red 7 GUI\obj\Release\Red 7 GUI.csproj.CoreCompileInputs.cache
+C:\Users\Blaise\source\repos\Red7\Red 7 GUI\Red 7 GUI\obj\Release\Red 7 GUI.exe
+C:\Users\Blaise\source\repos\Red7\Red 7 GUI\Red 7 GUI\obj\Release\Red 7 GUI.pdb
