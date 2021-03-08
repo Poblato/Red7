@@ -65,15 +65,19 @@ namespace Red_7_GUI
         {
             canvas.Text = client.Canvas.GetName();
             deckCardsLabel.Text = "Cards Left: " + client.Deck.Size.ToString();
-            opponent1HandButton.Text = "Hand: " + client.Hands[(player + 1) % 4].Size.ToString();//updates hand labels
-            if (players > 2)
+            try
             {
-                opponent2HandButton.Text = "Hand: " + client.Hands[(player + 2) % 4].Size.ToString();
-                if (player > 3)
+                opponent1HandButton.Text = "Hand: " + client.Hands[(player + 1) % 4].Size.ToString();//updates hand labels
+                if (players > 2)
                 {
-                    opponent3HandButton.Text = "Hand: " + client.Hands[(player + 3) % 4].Size.ToString();
+                    opponent2HandButton.Text = "Hand: " + client.Hands[(player + 2) % 4].Size.ToString();
+                    if (player > 3)
+                    {
+                        opponent3HandButton.Text = "Hand: " + client.Hands[(player + 3) % 4].Size.ToString();
+                    }
                 }
             }
+            catch (Exception) { }
             playerName.Text = playerNames[player];//updates player name labels
             opponent1Name.Text = playerNames[(player + 1) % 4];
             opponent2Name.Text = playerNames[(player + 2) % 4];

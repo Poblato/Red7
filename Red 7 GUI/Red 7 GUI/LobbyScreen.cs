@@ -22,8 +22,7 @@ namespace Red_7_GUI
         private bool advanced;
         private bool actionRule;
         private int port = 56565;
-        public string receive;
-        public string send = "";
+        private string receive;
         private bool gameStarted;
         private GameScreen game;
         bool serverStarted;

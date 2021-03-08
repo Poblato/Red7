@@ -270,7 +270,7 @@ namespace Red_7_GUI
             while (actions.Count > 0)
             {
                 action = actions.Dequeue();
-                Program.Display(action.Type);
+                //Program.Display(action.Type);
                 //Program.Display(action.StartPos[0].ToString() + " " + action.StartPos[1].ToString() + " " + action.StartPos[2].ToString());
                 //Program.Display(action.EndPos[0].ToString() + " " + action.EndPos[1].ToString() + " " + action.EndPos[2].ToString());
                 MoveCard(action.StartPos, action.EndPos);
@@ -289,11 +289,11 @@ namespace Red_7_GUI
             {
                 case -1://canvas
                     card = canvas.Pop();
-                    Program.Display("Moving from canvas");
+                    //Program.Display("Moving from canvas");
                     break;
                 case -2://deck
                     card = deck.DrawCard();
-                    Program.Display("Moving from deck");
+                    //Program.Display("Moving from deck");
                     break;
                 default://player
                     if (startPos[0] == 0)//hand
@@ -312,11 +312,11 @@ namespace Red_7_GUI
             switch (endPos[1])
             {
                 case -1://canvas
-                    Program.Display("to canvas");
+                    //Program.Display("to canvas");
                     canvas.Push(card);
                     break;
                 case -2://deck
-                    Program.Display("to deck");
+                    //Program.Display("to deck");
                     deck.AddCard(card);
                     break;
                 default://player
@@ -352,7 +352,7 @@ namespace Red_7_GUI
         public void EndTurn(bool winning)//ends the turn
         {
 
-            Program.Display(actions.Count.ToString());
+            //Program.Display(actions.Count.ToString());
 
             if (!winning && !canEnd)//if the player is not winning and they took actions that cannot be taken on a losing turn
             {
@@ -399,7 +399,7 @@ namespace Red_7_GUI
             try
             {
                 STW.WriteLine(data);
-                Program.Display("Sent " + data);
+                //Program.Display("Sent " + data);
             }
             catch (Exception e)
             {

@@ -53,7 +53,8 @@ namespace Red_7_GUI
             this.pictureBox1.InitialImage = null;
             this.pictureBox1.Location = new System.Drawing.Point(16, 16);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(421, 281);
+            this.pictureBox1.Size = new System.Drawing.Size(422, 255);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
             // 
