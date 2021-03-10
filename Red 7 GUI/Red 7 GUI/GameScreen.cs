@@ -323,7 +323,11 @@ namespace Red_7_GUI
         }
         private void endTurnButton_Click(object sender, EventArgs e)
         {
-            if (client.CheckWinner(this.player))//ends the turn if player is winning
+            if (client.GameState == 3 || client.GameState == 4) 
+            {
+                MessageBox.Show("You must discard a card before ending your turn");
+            }
+            else if (client.CheckWinner(this.player))//ends the turn if player is winning
             {
                 client.EndTurn(true);
             }

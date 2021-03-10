@@ -207,7 +207,7 @@ namespace Red_7_GUI
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.ToString());
+                MessageBox.Show("Could not connect to the server");
                 return false;
             }
 
@@ -346,6 +346,15 @@ namespace Red_7_GUI
             {
                 return false;
             }
+            else if (player == 0)
+            {
+                MessageBox.Show("Host has closed the lobby");
+                this.Invoke((MethodInvoker)delegate {
+                    Close();
+                    Program.Left();
+                });
+                return false;
+            }
             clientPlayers[player] = "";//removes player name
             for (int i = player; i < numPlayers - 1; i++)
             {
@@ -478,14 +487,53 @@ namespace Red_7_GUI
 
                     //MessageBox.Show("server received leave message");
                     SPlayerLeft(clientNum);
-                    msg = "1" + clientNum.ToString();
 
-                    for (int i = 0; i < numClients; i++)//sends to all cients
+                    if (gameStarted)
                     {
-                        if (clients[i].Connected)
+                        msg = "1" + "0" + clientNum.ToString();
+                        msg2 = "1" + "1" + clientNum.ToString();
+
+                        if (clientNum == currentPlayer)
                         {
-                            //MessageBox.Show("sending " + msg + " to " + i.ToString());
-                            writers[i].WriteLine(msg);//sends data to client i
+                            for (int i = 0; i < alivePlayers.Count; i++)//increments the player turn
+                            {
+                                if (currentPlayer == alivePlayers[i])
+                                {
+                                    currentPlayer = alivePlayers[(i + 1) % alivePlayers.Count];
+                                    break;
+                                }
+                            }
+                        }
+
+                        alivePlayers.Remove(clientNum);
+
+                        for (int i = 0; i < numClients; i++)//sends to all cients
+                        {
+                            if (clients[i].Connected)
+                            {
+                                if (i == currentPlayer)
+                                {
+                                    writers[i].WriteLine(msg2);//sends data to next player
+                                }
+                                else
+                                {
+                                    writers[i].WriteLine(msg);//sends data to client i
+                                }
+                                //MessageBox.Show("sending " + msg + " to " + i.ToString());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        msg = "1" + clientNum.ToString();
+
+                        for (int i = 0; i < numClients; i++)//sends to all cients
+                        {
+                            if (clients[i].Connected)
+                            {
+                                writers[i].WriteLine(msg);//sends data to client i
+                                //MessageBox.Show("sending " + msg + " to " + i.ToString());
+                            }
                         }
                     }
 
@@ -526,10 +574,21 @@ namespace Red_7_GUI
                     msg = "3" + clientNum.ToString() + data[1] + "0" + data.Substring(2);//all other players
                     msg2 = "3" + clientNum.ToString() + data[1] + "1" + data.Substring(2);//next player
 
+
+                    for (int i = 0; i < alivePlayers.Count; i++)//increments the player turn
+                    {
+                        if (currentPlayer == alivePlayers[i])
+                        {
+                            currentPlayer = alivePlayers[(i + 1) % alivePlayers.Count];
+                            break;
+                        }
+                    }
+
                     if (data[1] == '0')//player not winning
                     {
                         alivePlayers.Remove(clientNum);
                     }
+
                     if (alivePlayers.Count == 1)//if only one player left, game ends with them winning
                     {
                         int winner = alivePlayers[0];
@@ -544,15 +603,6 @@ namespace Red_7_GUI
                         }
                         return true;
                         //player wins
-                    }
-                    
-                    for (int i = 0; i < alivePlayers.Count; i++)//increments the player turn
-                    {
-                        if (currentPlayer == alivePlayers[i])
-                        {
-                            currentPlayer = alivePlayers[(i + 1) % alivePlayers.Count];
-                            break;
-                        }
                     }
 
                     foreach (int i in alivePlayers)

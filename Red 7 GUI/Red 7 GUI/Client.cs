@@ -115,9 +115,9 @@ namespace Red_7_GUI
                         gameState = 3;
 
                         bool largestPalette = true;//if the player's palette is largest, they are unable to discard from another player
-                        for (int i = 1; i < players; i++)
+                        foreach (int i in alivePlayers)
                         {
-                            if (palettes[i].Size >= palettes[0].Size)
+                            if (palettes[i].Size >= palettes[player].Size)
                             {
                                 largestPalette = false;
                             }
@@ -361,6 +361,7 @@ namespace Red_7_GUI
                     Undo(actions.Pop());
                 }
             }
+            
 
             gameState = -1;
             canEnd = true;
@@ -417,7 +418,11 @@ namespace Red_7_GUI
                          //MessageBox.Show("client received leave message");
                     try
                     {
-                        PlayerLeft(int.Parse(data[1].ToString()));
+                        if (data[1] == '1')
+                        {
+                            gameState = 0;//starts the player's turn
+                        }
+                        PlayerLeft(int.Parse(data[2].ToString()));
                     }
                     catch (Exception e)
                     {
