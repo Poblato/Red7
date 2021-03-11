@@ -29,7 +29,7 @@ namespace Red_7_GUI
         public GameScreen(int players, int player, string[] playerNames, bool advanced, bool actionRule, int seed, bool start, ref StreamWriter STW)
         {
             this.Text = "Game: " + players.ToString() + " players";
-            client = new Client(players, advanced, actionRule, seed, ref STW);//initialises variables
+            client = new Client(players, player, advanced, actionRule, seed, ref STW);//initialises variables
             palettes = new List<List<Button>>();
             playerHand = new List<Button>();
             this.players = players;
@@ -323,7 +323,11 @@ namespace Red_7_GUI
         }
         private void endTurnButton_Click(object sender, EventArgs e)
         {
-            if (client.GameState == 3 || client.GameState == 4) 
+            if (client.GameState == -1)
+            {
+                return;
+            }
+            else if (client.GameState == 3 || client.GameState == 4) 
             {
                 MessageBox.Show("You must discard a card before ending your turn");
             }
@@ -367,9 +371,9 @@ namespace Red_7_GUI
         {
             MessageBox.Show(msg);
         }
-        public void GameDecode(string msg)//pass through function from client receiver in lobby
+        public bool GameDecode(string msg)//pass through function from client receiver in lobby
         {
-            client.Decode(msg);
+            return client.Decode(msg);
         }
     }
 }

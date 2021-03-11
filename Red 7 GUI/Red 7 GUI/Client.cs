@@ -21,6 +21,7 @@ namespace Red_7_GUI
         private bool actionRule;
         private Stack<Action> actions;
         private List<int> alivePlayers;
+        private int player;
         private bool canEnd; // if the turn can be ended or actions must be undone beforehand (to prevent a losing player changing the outcome of the game)
 
         private int gameState; /*defines the state of the client
@@ -38,7 +39,7 @@ namespace Red_7_GUI
         public Deck Deck { get { return deck; } }
         public Card Canvas { get { return canvas.Peek(); } }
         public bool CanUndo { get { if (actions.Count == 0) return false; else return true; } }
-        public Client(int numPlayers, bool advanced, bool actionRule, int seed, ref StreamWriter STW)
+        public Client(int numPlayers, int player, bool advanced, bool actionRule, int seed, ref StreamWriter STW)
         {
             palettes = new List<Palette>();
             hands = new List<Hand>();
@@ -51,6 +52,7 @@ namespace Red_7_GUI
             this.STW = STW;
             canEnd = true;
             deck.Reset(seed);
+            this.player = player;
             this.advanced = advanced;
             this.actionRule = actionRule;
 
@@ -407,20 +409,22 @@ namespace Red_7_GUI
                 Program.Display(e.ToString());
             }
         }
-        public void Decode(string data)//decodes data received from the server
+        public bool Decode(string data)//decodes data received from the server
         {
             switch (data[0])
             {
                 case '0'://join
                     Program.Display("Join request during game");
-                    break;
+                    return true;
                 case '1'://leave
                          //MessageBox.Show("client received leave message");
+
                     try
                     {
                         if (data[1] == '1')
                         {
                             gameState = 0;//starts the player's turn
+                            Program.Update(-1);
                         }
                         PlayerLeft(int.Parse(data[2].ToString()));
                     }
@@ -428,10 +432,22 @@ namespace Red_7_GUI
                     {
                         Program.Display(e.ToString());
                     }
-                    break;
+
+                    if (data[2].ToString() == player.ToString())
+                    {
+                        return false;
+                    }
+                    else if (data[2] == '0')//if host has left
+                    {
+                        Program.Display("Host has left the game - the game can no longer continue");
+                        return false;
+                    }
+
+
+                    return true;
                 case '2'://rule update
                     Program.Display("Rule change request during game");
-                    break;
+                    return true;
                 case '3'://end turn
                     //Program.Display("switched");
                     int prevPlayer = int.Parse(data[1].ToString());
@@ -468,10 +484,10 @@ namespace Red_7_GUI
                         gameState = 0;
                     }
                     Program.Update(-1);
-                    break;
+                    return true;
                 case '4'://start game
                     Program.Display("Start game request during game");
-                    break;
+                    return true;
                 case '5'://game over
                     int winner = -1;
                     try
@@ -483,10 +499,10 @@ namespace Red_7_GUI
                         Program.Display("non-integer player win");
                     }
                     Program.EndGame(winner);
-                    break;
+                    return true;
                 default:
                     Program.Display("Invalid transmission type at client");
-                    break;
+                    return true;
             }
         }
         private string ActionEncode(Queue<Action> actions)//encodes actions into a string

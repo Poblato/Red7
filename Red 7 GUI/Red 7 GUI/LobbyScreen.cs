@@ -234,7 +234,7 @@ namespace Red_7_GUI
                         //MessageBox.Show("Received " + receive);
                         if (gameStarted)
                         {
-                            game.GameDecode(receive);
+                            cont = game.GameDecode(receive);
                         }
                         else
                         {
@@ -490,16 +490,20 @@ namespace Red_7_GUI
 
                     if (gameStarted)
                     {
+                        //MessageBox.Show("player left during game");
+                        
                         msg = "1" + "0" + clientNum.ToString();
                         msg2 = "1" + "1" + clientNum.ToString();
 
                         if (clientNum == currentPlayer)
                         {
+                            //MessageBox.Show("player left during their turn");
                             for (int i = 0; i < alivePlayers.Count; i++)//increments the player turn
                             {
                                 if (currentPlayer == alivePlayers[i])
                                 {
                                     currentPlayer = alivePlayers[(i + 1) % alivePlayers.Count];
+                                    //MessageBox.Show("next player is " + currentPlayer.ToString());
                                     break;
                                 }
                             }
@@ -660,7 +664,7 @@ namespace Red_7_GUI
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show(ex.ToString());
+                        //MessageBox.Show(ex.ToString());
                     }
                 }
             }
